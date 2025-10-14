@@ -1,0 +1,1484 @@
+.
+├── MarsYard2024
+│   ├── configuration
+│   │   ├── marsyard_reduced_base.usd
+│   │   ├── marsyard_reduced_physics.usd
+│   │   └── marsyard_reduced_sensor.usd
+│   ├── marsyard.blend
+│   ├── marsyard.mtl
+│   ├── marsyard.obj
+│   ├── marsyard_og.obj
+│   ├── marsyard_reduced_16k.mtl
+│   ├── marsyard_reduced_16k.obj
+│   ├── marsyard_reduced_16k.usd
+│   ├── marsyard_reduced.mtl
+│   ├── marsyard_reduced.obj
+│   ├── marsyard_reduced.usd
+│   ├── test_fine.usd
+│   ├── test_fine.usdc
+│   ├── texture_1001.png
+│   ├── texture_1002.png
+│   ├── texture_1003.png
+│   ├── texture_1004.png
+│   ├── texture_1005.png
+│   ├── texture_1006.png
+│   ├── texture_1007.png
+│   ├── texture_1008.png
+│   ├── texture_1009.png
+│   ├── texturedMesh - MY_2024_FINAL.obj
+│   ├── texturedMesh - MY_2024_FINAL.obj.mtl
+│   └── textures
+│       ├── color_121212.hdr
+│       ├── texture_1001.png
+│       ├── texture_1002.png
+│       ├── texture_1003.png
+│       ├── texture_1004.png
+│       ├── texture_1005.png
+│       ├── texture_1006.png
+│       ├── texture_1007.png
+│       ├── texture_1008.png
+│       └── texture_1009.png
+├── morpheus_isaac.usd
+├── morpheus_ws
+│   ├── build
+│   │   ├── COLCON_IGNORE
+│   │   ├── morpheus_control
+│   │   │   ├── ament_cmake_core
+│   │   │   │   ├── morpheus_controlConfig.cmake
+│   │   │   │   ├── morpheus_controlConfig-version.cmake
+│   │   │   │   ├── package.cmake
+│   │   │   │   └── stamps
+│   │   │   │       ├── ament_prefix_path.sh.stamp
+│   │   │   │       ├── nameConfig.cmake.in.stamp
+│   │   │   │       ├── nameConfig-version.cmake.in.stamp
+│   │   │   │       ├── package_xml_2_cmake.py.stamp
+│   │   │   │       ├── package.xml.stamp
+│   │   │   │       ├── path.sh.stamp
+│   │   │   │       └── templates_2_cmake.py.stamp
+│   │   │   ├── ament_cmake_environment_hooks
+│   │   │   │   ├── ament_prefix_path.dsv
+│   │   │   │   ├── local_setup.bash
+│   │   │   │   ├── local_setup.dsv
+│   │   │   │   ├── local_setup.sh
+│   │   │   │   ├── local_setup.zsh
+│   │   │   │   ├── package.dsv
+│   │   │   │   └── path.dsv
+│   │   │   ├── ament_cmake_index
+│   │   │   │   └── share
+│   │   │   │       └── ament_index
+│   │   │   │           └── resource_index
+│   │   │   │               ├── package_run_dependencies
+│   │   │   │               │   └── morpheus_control
+│   │   │   │               ├── packages
+│   │   │   │               │   └── morpheus_control
+│   │   │   │               └── parent_prefix_path
+│   │   │   │                   └── morpheus_control
+│   │   │   ├── ament_cmake_package_templates
+│   │   │   │   └── templates.cmake
+│   │   │   ├── ament_cmake_uninstall_target
+│   │   │   │   └── ament_cmake_uninstall_target.cmake
+│   │   │   ├── ament_flake8
+│   │   │   ├── ament_lint_cmake
+│   │   │   ├── ament_pep257
+│   │   │   ├── ament_xmllint
+│   │   │   ├── cmake_args.last
+│   │   │   ├── CMakeCache.txt
+│   │   │   ├── CMakeFiles
+│   │   │   │   ├── 3.22.1
+│   │   │   │   │   ├── CMakeCCompiler.cmake
+│   │   │   │   │   ├── CMakeCXXCompiler.cmake
+│   │   │   │   │   ├── CMakeDetermineCompilerABI_C.bin
+│   │   │   │   │   ├── CMakeDetermineCompilerABI_CXX.bin
+│   │   │   │   │   ├── CMakeSystem.cmake
+│   │   │   │   │   ├── CompilerIdC
+│   │   │   │   │   │   ├── a.out
+│   │   │   │   │   │   ├── CMakeCCompilerId.c
+│   │   │   │   │   │   └── tmp
+│   │   │   │   │   └── CompilerIdCXX
+│   │   │   │   │       ├── a.out
+│   │   │   │   │       ├── CMakeCXXCompilerId.cpp
+│   │   │   │   │       └── tmp
+│   │   │   │   ├── cmake.check_cache
+│   │   │   │   ├── CMakeDirectoryInformation.cmake
+│   │   │   │   ├── CMakeOutput.log
+│   │   │   │   ├── CMakeRuleHashes.txt
+│   │   │   │   ├── CMakeTmp
+│   │   │   │   ├── Makefile2
+│   │   │   │   ├── Makefile.cmake
+│   │   │   │   ├── morpheus_control_uninstall.dir
+│   │   │   │   │   ├── build.make
+│   │   │   │   │   ├── cmake_clean.cmake
+│   │   │   │   │   ├── compiler_depend.make
+│   │   │   │   │   ├── compiler_depend.ts
+│   │   │   │   │   ├── DependInfo.cmake
+│   │   │   │   │   └── progress.make
+│   │   │   │   ├── progress.marks
+│   │   │   │   ├── TargetDirectories.txt
+│   │   │   │   └── uninstall.dir
+│   │   │   │       ├── build.make
+│   │   │   │       ├── cmake_clean.cmake
+│   │   │   │       ├── compiler_depend.make
+│   │   │   │       ├── compiler_depend.ts
+│   │   │   │       ├── DependInfo.cmake
+│   │   │   │       └── progress.make
+│   │   │   ├── cmake_install.cmake
+│   │   │   ├── colcon_build.rc
+│   │   │   ├── colcon_command_prefix_build.sh
+│   │   │   ├── colcon_command_prefix_build.sh.env
+│   │   │   ├── CTestConfiguration.ini
+│   │   │   ├── CTestCustom.cmake
+│   │   │   ├── CTestTestfile.cmake
+│   │   │   ├── install_manifest.txt
+│   │   │   └── Makefile
+│   │   ├── morpheus_description
+│   │   │   ├── ament_cmake_core
+│   │   │   │   ├── morpheus_descriptionConfig.cmake
+│   │   │   │   ├── morpheus_descriptionConfig-version.cmake
+│   │   │   │   ├── package.cmake
+│   │   │   │   └── stamps
+│   │   │   │       ├── ament_prefix_path.sh.stamp
+│   │   │   │       ├── nameConfig.cmake.in.stamp
+│   │   │   │       ├── nameConfig-version.cmake.in.stamp
+│   │   │   │       ├── package_xml_2_cmake.py.stamp
+│   │   │   │       ├── package.xml.stamp
+│   │   │   │       ├── path.sh.stamp
+│   │   │   │       └── templates_2_cmake.py.stamp
+│   │   │   ├── ament_cmake_environment_hooks
+│   │   │   │   ├── ament_prefix_path.dsv
+│   │   │   │   ├── local_setup.bash
+│   │   │   │   ├── local_setup.dsv
+│   │   │   │   ├── local_setup.sh
+│   │   │   │   ├── local_setup.zsh
+│   │   │   │   ├── package.dsv
+│   │   │   │   └── path.dsv
+│   │   │   ├── ament_cmake_index
+│   │   │   │   └── share
+│   │   │   │       └── ament_index
+│   │   │   │           └── resource_index
+│   │   │   │               ├── package_run_dependencies
+│   │   │   │               │   └── morpheus_description
+│   │   │   │               ├── packages
+│   │   │   │               │   └── morpheus_description
+│   │   │   │               └── parent_prefix_path
+│   │   │   │                   └── morpheus_description
+│   │   │   ├── ament_cmake_package_templates
+│   │   │   │   └── templates.cmake
+│   │   │   ├── ament_cmake_uninstall_target
+│   │   │   │   └── ament_cmake_uninstall_target.cmake
+│   │   │   ├── ament_copyright
+│   │   │   ├── ament_flake8
+│   │   │   ├── ament_lint_cmake
+│   │   │   ├── ament_pep257
+│   │   │   ├── ament_xmllint
+│   │   │   ├── cmake_args.last
+│   │   │   ├── CMakeCache.txt
+│   │   │   ├── CMakeFiles
+│   │   │   │   ├── 3.22.1
+│   │   │   │   │   ├── CMakeCCompiler.cmake
+│   │   │   │   │   ├── CMakeCXXCompiler.cmake
+│   │   │   │   │   ├── CMakeDetermineCompilerABI_C.bin
+│   │   │   │   │   ├── CMakeDetermineCompilerABI_CXX.bin
+│   │   │   │   │   ├── CMakeSystem.cmake
+│   │   │   │   │   ├── CompilerIdC
+│   │   │   │   │   │   ├── a.out
+│   │   │   │   │   │   ├── CMakeCCompilerId.c
+│   │   │   │   │   │   └── tmp
+│   │   │   │   │   └── CompilerIdCXX
+│   │   │   │   │       ├── a.out
+│   │   │   │   │       ├── CMakeCXXCompilerId.cpp
+│   │   │   │   │       └── tmp
+│   │   │   │   ├── cmake.check_cache
+│   │   │   │   ├── CMakeDirectoryInformation.cmake
+│   │   │   │   ├── CMakeOutput.log
+│   │   │   │   ├── CMakeRuleHashes.txt
+│   │   │   │   ├── CMakeTmp
+│   │   │   │   ├── Makefile2
+│   │   │   │   ├── Makefile.cmake
+│   │   │   │   ├── morpheus_description_uninstall.dir
+│   │   │   │   │   ├── build.make
+│   │   │   │   │   ├── cmake_clean.cmake
+│   │   │   │   │   ├── compiler_depend.make
+│   │   │   │   │   ├── compiler_depend.ts
+│   │   │   │   │   ├── DependInfo.cmake
+│   │   │   │   │   └── progress.make
+│   │   │   │   ├── progress.marks
+│   │   │   │   ├── TargetDirectories.txt
+│   │   │   │   └── uninstall.dir
+│   │   │   │       ├── build.make
+│   │   │   │       ├── cmake_clean.cmake
+│   │   │   │       ├── compiler_depend.make
+│   │   │   │       ├── compiler_depend.ts
+│   │   │   │       ├── DependInfo.cmake
+│   │   │   │       └── progress.make
+│   │   │   ├── cmake_install.cmake
+│   │   │   ├── colcon_build.rc
+│   │   │   ├── colcon_command_prefix_build.sh
+│   │   │   ├── colcon_command_prefix_build.sh.env
+│   │   │   ├── CTestConfiguration.ini
+│   │   │   ├── CTestCustom.cmake
+│   │   │   ├── CTestTestfile.cmake
+│   │   │   ├── install_manifest.txt
+│   │   │   └── Makefile
+│   │   ├── morpheus_simulation
+│   │   │   ├── ament_cmake_core
+│   │   │   │   ├── morpheus_simulationConfig.cmake
+│   │   │   │   ├── morpheus_simulationConfig-version.cmake
+│   │   │   │   ├── package.cmake
+│   │   │   │   └── stamps
+│   │   │   │       ├── ament_prefix_path.sh.stamp
+│   │   │   │       ├── nameConfig.cmake.in.stamp
+│   │   │   │       ├── nameConfig-version.cmake.in.stamp
+│   │   │   │       ├── package_xml_2_cmake.py.stamp
+│   │   │   │       ├── package.xml.stamp
+│   │   │   │       ├── path.sh.stamp
+│   │   │   │       └── templates_2_cmake.py.stamp
+│   │   │   ├── ament_cmake_environment_hooks
+│   │   │   │   ├── ament_prefix_path.dsv
+│   │   │   │   ├── local_setup.bash
+│   │   │   │   ├── local_setup.dsv
+│   │   │   │   ├── local_setup.sh
+│   │   │   │   ├── local_setup.zsh
+│   │   │   │   ├── package.dsv
+│   │   │   │   └── path.dsv
+│   │   │   ├── ament_cmake_index
+│   │   │   │   └── share
+│   │   │   │       └── ament_index
+│   │   │   │           └── resource_index
+│   │   │   │               ├── package_run_dependencies
+│   │   │   │               │   └── morpheus_simulation
+│   │   │   │               ├── packages
+│   │   │   │               │   └── morpheus_simulation
+│   │   │   │               └── parent_prefix_path
+│   │   │   │                   └── morpheus_simulation
+│   │   │   ├── ament_cmake_package_templates
+│   │   │   │   └── templates.cmake
+│   │   │   ├── ament_cmake_uninstall_target
+│   │   │   │   └── ament_cmake_uninstall_target.cmake
+│   │   │   ├── ament_flake8
+│   │   │   ├── ament_lint_cmake
+│   │   │   ├── ament_pep257
+│   │   │   ├── ament_xmllint
+│   │   │   ├── cmake_args.last
+│   │   │   ├── CMakeCache.txt
+│   │   │   ├── CMakeFiles
+│   │   │   │   ├── 3.22.1
+│   │   │   │   │   ├── CMakeCCompiler.cmake
+│   │   │   │   │   ├── CMakeCXXCompiler.cmake
+│   │   │   │   │   ├── CMakeDetermineCompilerABI_C.bin
+│   │   │   │   │   ├── CMakeDetermineCompilerABI_CXX.bin
+│   │   │   │   │   ├── CMakeSystem.cmake
+│   │   │   │   │   ├── CompilerIdC
+│   │   │   │   │   │   ├── a.out
+│   │   │   │   │   │   ├── CMakeCCompilerId.c
+│   │   │   │   │   │   └── tmp
+│   │   │   │   │   └── CompilerIdCXX
+│   │   │   │   │       ├── a.out
+│   │   │   │   │       ├── CMakeCXXCompilerId.cpp
+│   │   │   │   │       └── tmp
+│   │   │   │   ├── cmake.check_cache
+│   │   │   │   ├── CMakeDirectoryInformation.cmake
+│   │   │   │   ├── CMakeOutput.log
+│   │   │   │   ├── CMakeRuleHashes.txt
+│   │   │   │   ├── CMakeTmp
+│   │   │   │   ├── Makefile2
+│   │   │   │   ├── Makefile.cmake
+│   │   │   │   ├── morpheus_simulation_uninstall.dir
+│   │   │   │   │   ├── build.make
+│   │   │   │   │   ├── cmake_clean.cmake
+│   │   │   │   │   ├── compiler_depend.make
+│   │   │   │   │   ├── compiler_depend.ts
+│   │   │   │   │   ├── DependInfo.cmake
+│   │   │   │   │   └── progress.make
+│   │   │   │   ├── progress.marks
+│   │   │   │   ├── TargetDirectories.txt
+│   │   │   │   └── uninstall.dir
+│   │   │   │       ├── build.make
+│   │   │   │       ├── cmake_clean.cmake
+│   │   │   │       ├── compiler_depend.make
+│   │   │   │       ├── compiler_depend.ts
+│   │   │   │       ├── DependInfo.cmake
+│   │   │   │       └── progress.make
+│   │   │   ├── cmake_install.cmake
+│   │   │   ├── colcon_build.rc
+│   │   │   ├── colcon_command_prefix_build.sh
+│   │   │   ├── colcon_command_prefix_build.sh.env
+│   │   │   ├── CTestConfiguration.ini
+│   │   │   ├── CTestCustom.cmake
+│   │   │   ├── CTestTestfile.cmake
+│   │   │   ├── install_manifest.txt
+│   │   │   └── Makefile
+│   │   ├── ros2_aruco
+│   │   │   ├── build
+│   │   │   │   └── lib
+│   │   │   │       └── ros2_aruco
+│   │   │   │           ├── aruco_generate_marker.py
+│   │   │   │           ├── aruco_node.py
+│   │   │   │           └── __init__.py
+│   │   │   ├── colcon_build.rc
+│   │   │   ├── colcon_command_prefix_setup_py.sh
+│   │   │   ├── colcon_command_prefix_setup_py.sh.env
+│   │   │   ├── install.log
+│   │   │   ├── prefix_override
+│   │   │   │   └── sitecustomize.py
+│   │   │   └── ros2_aruco.egg-info
+│   │   │       ├── dependency_links.txt
+│   │   │       ├── entry_points.txt
+│   │   │       ├── PKG-INFO
+│   │   │       ├── requires.txt
+│   │   │       ├── SOURCES.txt
+│   │   │       ├── top_level.txt
+│   │   │       └── zip-safe
+│   │   └── ros2_aruco_interfaces
+│   │       ├── ament_cmake_core
+│   │       │   ├── package.cmake
+│   │       │   ├── ros2_aruco_interfacesConfig.cmake
+│   │       │   ├── ros2_aruco_interfacesConfig-version.cmake
+│   │       │   └── stamps
+│   │       │       ├── ament_cmake_export_dependencies-extras.cmake.stamp
+│   │       │       ├── ament_cmake_export_include_directories-extras.cmake.stamp
+│   │       │       ├── ament_cmake_export_libraries-extras.cmake.stamp
+│   │       │       ├── ament_cmake_export_targets-extras.cmake.stamp
+│   │       │       ├── ament_prefix_path.sh.stamp
+│   │       │       ├── ArucoMarkers.msg.stamp
+│   │       │       ├── library_path.sh.stamp
+│   │       │       ├── nameConfig.cmake.in.stamp
+│   │       │       ├── nameConfig-version.cmake.in.stamp
+│   │       │       ├── package_xml_2_cmake.py.stamp
+│   │       │       ├── package.xml.stamp
+│   │       │       ├── path.sh.stamp
+│   │       │       ├── pythonpath.sh.in.stamp
+│   │       │       ├── rosidl_cmake_export_typesupport_libraries-extras.cmake.stamp
+│   │       │       ├── rosidl_cmake_export_typesupport_targets-extras.cmake.stamp
+│   │       │       ├── rosidl_cmake-extras.cmake.stamp
+│   │       │       └── templates_2_cmake.py.stamp
+│   │       ├── ament_cmake_environment_hooks
+│   │       │   ├── ament_prefix_path.dsv
+│   │       │   ├── library_path.dsv
+│   │       │   ├── local_setup.bash
+│   │       │   ├── local_setup.dsv
+│   │       │   ├── local_setup.sh
+│   │       │   ├── local_setup.zsh
+│   │       │   ├── package.dsv
+│   │       │   ├── path.dsv
+│   │       │   ├── pythonpath.dsv
+│   │       │   └── pythonpath.sh
+│   │       ├── ament_cmake_export_dependencies
+│   │       │   └── ament_cmake_export_dependencies-extras.cmake
+│   │       ├── ament_cmake_export_include_directories
+│   │       │   └── ament_cmake_export_include_directories-extras.cmake
+│   │       ├── ament_cmake_export_libraries
+│   │       │   └── ament_cmake_export_libraries-extras.cmake
+│   │       ├── ament_cmake_export_targets
+│   │       │   └── ament_cmake_export_targets-extras.cmake
+│   │       ├── ament_cmake_index
+│   │       │   └── share
+│   │       │       └── ament_index
+│   │       │           └── resource_index
+│   │       │               ├── package_run_dependencies
+│   │       │               │   └── ros2_aruco_interfaces
+│   │       │               ├── packages
+│   │       │               │   └── ros2_aruco_interfaces
+│   │       │               ├── parent_prefix_path
+│   │       │               │   └── ros2_aruco_interfaces
+│   │       │               └── rosidl_interfaces
+│   │       │                   └── ros2_aruco_interfaces
+│   │       ├── ament_cmake_package_templates
+│   │       │   └── templates.cmake
+│   │       ├── ament_cmake_python
+│   │       │   └── ros2_aruco_interfaces
+│   │       │       ├── ros2_aruco_interfaces
+│   │       │       │   ├── __init__.py
+│   │       │       │   ├── libros2_aruco_interfaces__rosidl_generator_py.so
+│   │       │       │   ├── msg
+│   │       │       │   │   ├── _aruco_markers.py
+│   │       │       │   │   ├── _aruco_markers_s.c
+│   │       │       │   │   └── __init__.py
+│   │       │       │   ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_c.c
+│   │       │       │   ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c
+│   │       │       │   ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_introspection_c.c
+│   │       │       │   ├── ros2_aruco_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+│   │       │       │   ├── ros2_aruco_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+│   │       │       │   └── ros2_aruco_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+│   │       │       ├── ros2_aruco_interfaces.egg-info
+│   │       │       │   ├── dependency_links.txt
+│   │       │       │   ├── PKG-INFO
+│   │       │       │   ├── SOURCES.txt
+│   │       │       │   └── top_level.txt
+│   │       │       └── setup.py
+│   │       ├── ament_cmake_uninstall_target
+│   │       │   └── ament_cmake_uninstall_target.cmake
+│   │       ├── ament_copyright
+│   │       ├── ament_lint_cmake
+│   │       ├── ament_xmllint
+│   │       ├── cmake_args.last
+│   │       ├── CMakeCache.txt
+│   │       ├── CMakeFiles
+│   │       │   ├── 3.22.1
+│   │       │   │   ├── CMakeCCompiler.cmake
+│   │       │   │   ├── CMakeCXXCompiler.cmake
+│   │       │   │   ├── CMakeDetermineCompilerABI_C.bin
+│   │       │   │   ├── CMakeDetermineCompilerABI_CXX.bin
+│   │       │   │   ├── CMakeSystem.cmake
+│   │       │   │   ├── CompilerIdC
+│   │       │   │   │   ├── a.out
+│   │       │   │   │   ├── CMakeCCompilerId.c
+│   │       │   │   │   └── tmp
+│   │       │   │   └── CompilerIdCXX
+│   │       │   │       ├── a.out
+│   │       │   │       ├── CMakeCXXCompilerId.cpp
+│   │       │   │       └── tmp
+│   │       │   ├── ament_cmake_python_build_ros2_aruco_interfaces_egg.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   └── progress.make
+│   │       │   ├── ament_cmake_python_copy_ros2_aruco_interfaces.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   └── progress.make
+│   │       │   ├── cmake.check_cache
+│   │       │   ├── CMakeDirectoryInformation.cmake
+│   │       │   ├── CMakeOutput.log
+│   │       │   ├── CMakeRuleHashes.txt
+│   │       │   ├── CMakeTmp
+│   │       │   ├── Export
+│   │       │   │   └── share
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           └── cmake
+│   │       │   │               ├── export_ros2_aruco_interfaces__rosidl_generator_cExport.cmake
+│   │       │   │               ├── export_ros2_aruco_interfaces__rosidl_generator_cExport-noconfig.cmake
+│   │       │   │               ├── export_ros2_aruco_interfaces__rosidl_generator_cppExport.cmake
+│   │       │   │               ├── export_ros2_aruco_interfaces__rosidl_generator_pyExport.cmake
+│   │       │   │               ├── export_ros2_aruco_interfaces__rosidl_generator_pyExport-noconfig.cmake
+│   │       │   │               ├── export_ros2_aruco_interfaces__rosidl_typesupport_fastrtps_cExport.cmake
+│   │       │   │               ├── export_ros2_aruco_interfaces__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+│   │       │   │               ├── export_ros2_aruco_interfaces__rosidl_typesupport_fastrtps_cppExport.cmake
+│   │       │   │               ├── export_ros2_aruco_interfaces__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+│   │       │   │               ├── ros2_aruco_interfaces__rosidl_typesupport_cExport.cmake
+│   │       │   │               ├── ros2_aruco_interfaces__rosidl_typesupport_cExport-noconfig.cmake
+│   │       │   │               ├── ros2_aruco_interfaces__rosidl_typesupport_cppExport.cmake
+│   │       │   │               ├── ros2_aruco_interfaces__rosidl_typesupport_cppExport-noconfig.cmake
+│   │       │   │               ├── ros2_aruco_interfaces__rosidl_typesupport_introspection_cExport.cmake
+│   │       │   │               ├── ros2_aruco_interfaces__rosidl_typesupport_introspection_cExport-noconfig.cmake
+│   │       │   │               ├── ros2_aruco_interfaces__rosidl_typesupport_introspection_cppExport.cmake
+│   │       │   │               └── ros2_aruco_interfaces__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+│   │       │   ├── Makefile2
+│   │       │   ├── Makefile.cmake
+│   │       │   ├── progress.marks
+│   │       │   ├── ros2_aruco_interfaces__cpp.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   └── progress.make
+│   │       │   ├── ros2_aruco_interfaces.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   └── progress.make
+│   │       │   ├── ros2_aruco_interfaces__rosidl_generator_c.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.internal
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   ├── depend.make
+│   │       │   │   ├── flags.make
+│   │       │   │   ├── link.txt
+│   │       │   │   ├── progress.make
+│   │       │   │   └── rosidl_generator_c
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           └── msg
+│   │       │   │               └── detail
+│   │       │   │                   ├── aruco_markers__functions.c.o
+│   │       │   │                   └── aruco_markers__functions.c.o.d
+│   │       │   ├── ros2_aruco_interfaces__rosidl_generator_py.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.internal
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   ├── depend.make
+│   │       │   │   ├── flags.make
+│   │       │   │   ├── link.txt
+│   │       │   │   ├── progress.make
+│   │       │   │   └── rosidl_generator_py
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           └── msg
+│   │       │   │               ├── _aruco_markers_s.c.o
+│   │       │   │               └── _aruco_markers_s.c.o.d
+│   │       │   ├── ros2_aruco_interfaces__rosidl_typesupport_c.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.internal
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   ├── depend.make
+│   │       │   │   ├── flags.make
+│   │       │   │   ├── link.txt
+│   │       │   │   ├── progress.make
+│   │       │   │   └── rosidl_typesupport_c
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           └── msg
+│   │       │   │               ├── aruco_markers__type_support.cpp.o
+│   │       │   │               └── aruco_markers__type_support.cpp.o.d
+│   │       │   ├── ros2_aruco_interfaces__rosidl_typesupport_cpp.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.internal
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   ├── depend.make
+│   │       │   │   ├── flags.make
+│   │       │   │   ├── link.txt
+│   │       │   │   ├── progress.make
+│   │       │   │   └── rosidl_typesupport_cpp
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           └── msg
+│   │       │   │               ├── aruco_markers__type_support.cpp.o
+│   │       │   │               └── aruco_markers__type_support.cpp.o.d
+│   │       │   ├── ros2_aruco_interfaces__rosidl_typesupport_c__pyext.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.internal
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   ├── depend.make
+│   │       │   │   ├── flags.make
+│   │       │   │   ├── link.txt
+│   │       │   │   ├── progress.make
+│   │       │   │   └── rosidl_generator_py
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_c.c.o
+│   │       │   │           └── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_c.c.o.d
+│   │       │   ├── ros2_aruco_interfaces__rosidl_typesupport_fastrtps_c.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.internal
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   ├── depend.make
+│   │       │   │   ├── flags.make
+│   │       │   │   ├── link.txt
+│   │       │   │   ├── progress.make
+│   │       │   │   └── rosidl_typesupport_fastrtps_c
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           └── msg
+│   │       │   │               └── detail
+│   │       │   │                   ├── aruco_markers__type_support_c.cpp.o
+│   │       │   │                   └── aruco_markers__type_support_c.cpp.o.d
+│   │       │   ├── ros2_aruco_interfaces__rosidl_typesupport_fastrtps_cpp.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.internal
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   ├── depend.make
+│   │       │   │   ├── flags.make
+│   │       │   │   ├── link.txt
+│   │       │   │   ├── progress.make
+│   │       │   │   └── rosidl_typesupport_fastrtps_cpp
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           └── msg
+│   │       │   │               └── detail
+│   │       │   │                   └── dds_fastrtps
+│   │       │   │                       ├── aruco_markers__type_support.cpp.o
+│   │       │   │                       └── aruco_markers__type_support.cpp.o.d
+│   │       │   ├── ros2_aruco_interfaces__rosidl_typesupport_fastrtps_c__pyext.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.internal
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   ├── depend.make
+│   │       │   │   ├── flags.make
+│   │       │   │   ├── link.txt
+│   │       │   │   ├── progress.make
+│   │       │   │   └── rosidl_generator_py
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c.o
+│   │       │   │           └── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c.o.d
+│   │       │   ├── ros2_aruco_interfaces__rosidl_typesupport_introspection_c.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.internal
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   ├── depend.make
+│   │       │   │   ├── flags.make
+│   │       │   │   ├── link.txt
+│   │       │   │   ├── progress.make
+│   │       │   │   └── rosidl_typesupport_introspection_c
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           └── msg
+│   │       │   │               └── detail
+│   │       │   │                   ├── aruco_markers__type_support.c.o
+│   │       │   │                   └── aruco_markers__type_support.c.o.d
+│   │       │   ├── ros2_aruco_interfaces__rosidl_typesupport_introspection_cpp.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.internal
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   ├── depend.make
+│   │       │   │   ├── flags.make
+│   │       │   │   ├── link.txt
+│   │       │   │   ├── progress.make
+│   │       │   │   └── rosidl_typesupport_introspection_cpp
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           └── msg
+│   │       │   │               └── detail
+│   │       │   │                   ├── aruco_markers__type_support.cpp.o
+│   │       │   │                   └── aruco_markers__type_support.cpp.o.d
+│   │       │   ├── ros2_aruco_interfaces__rosidl_typesupport_introspection_c__pyext.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.internal
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   ├── depend.make
+│   │       │   │   ├── flags.make
+│   │       │   │   ├── link.txt
+│   │       │   │   ├── progress.make
+│   │       │   │   └── rosidl_generator_py
+│   │       │   │       └── ros2_aruco_interfaces
+│   │       │   │           ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_introspection_c.c.o
+│   │       │   │           └── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_introspection_c.c.o.d
+│   │       │   ├── ros2_aruco_interfaces_uninstall.dir
+│   │       │   │   ├── build.make
+│   │       │   │   ├── cmake_clean.cmake
+│   │       │   │   ├── compiler_depend.make
+│   │       │   │   ├── compiler_depend.ts
+│   │       │   │   ├── DependInfo.cmake
+│   │       │   │   └── progress.make
+│   │       │   ├── TargetDirectories.txt
+│   │       │   └── uninstall.dir
+│   │       │       ├── build.make
+│   │       │       ├── cmake_clean.cmake
+│   │       │       ├── compiler_depend.make
+│   │       │       ├── compiler_depend.ts
+│   │       │       ├── DependInfo.cmake
+│   │       │       └── progress.make
+│   │       ├── cmake_install.cmake
+│   │       ├── colcon_build.rc
+│   │       ├── colcon_command_prefix_build.sh
+│   │       ├── colcon_command_prefix_build.sh.env
+│   │       ├── CTestConfiguration.ini
+│   │       ├── CTestCustom.cmake
+│   │       ├── CTestTestfile.cmake
+│   │       ├── install_manifest.txt
+│   │       ├── libros2_aruco_interfaces__rosidl_generator_c.so
+│   │       ├── libros2_aruco_interfaces__rosidl_typesupport_cpp.so
+│   │       ├── libros2_aruco_interfaces__rosidl_typesupport_c.so
+│   │       ├── libros2_aruco_interfaces__rosidl_typesupport_fastrtps_cpp.so
+│   │       ├── libros2_aruco_interfaces__rosidl_typesupport_fastrtps_c.so
+│   │       ├── libros2_aruco_interfaces__rosidl_typesupport_introspection_cpp.so
+│   │       ├── libros2_aruco_interfaces__rosidl_typesupport_introspection_c.so
+│   │       ├── Makefile
+│   │       ├── ros2_aruco_interfaces__py
+│   │       │   ├── CMakeFiles
+│   │       │   │   ├── CMakeDirectoryInformation.cmake
+│   │       │   │   ├── progress.marks
+│   │       │   │   └── ros2_aruco_interfaces__py.dir
+│   │       │   │       ├── build.make
+│   │       │   │       ├── cmake_clean.cmake
+│   │       │   │       ├── compiler_depend.make
+│   │       │   │       ├── compiler_depend.ts
+│   │       │   │       ├── DependInfo.cmake
+│   │       │   │       └── progress.make
+│   │       │   ├── cmake_install.cmake
+│   │       │   ├── CMakeLists.txt
+│   │       │   ├── CTestTestfile.cmake
+│   │       │   └── Makefile
+│   │       ├── rosidl_adapter
+│   │       │   ├── ros2_aruco_interfaces
+│   │       │   │   └── msg
+│   │       │   │       └── ArucoMarkers.idl
+│   │       │   └── ros2_aruco_interfaces.idls
+│   │       ├── rosidl_adapter__arguments__ros2_aruco_interfaces.json
+│   │       ├── rosidl_cmake
+│   │       │   ├── rosidl_cmake_export_typesupport_libraries-extras.cmake
+│   │       │   ├── rosidl_cmake_export_typesupport_targets-extras.cmake
+│   │       │   └── rosidl_cmake-extras.cmake
+│   │       ├── rosidl_generator_c
+│   │       │   └── ros2_aruco_interfaces
+│   │       │       └── msg
+│   │       │           ├── aruco_markers.h
+│   │       │           ├── detail
+│   │       │           │   ├── aruco_markers__functions.c
+│   │       │           │   ├── aruco_markers__functions.h
+│   │       │           │   ├── aruco_markers__struct.h
+│   │       │           │   └── aruco_markers__type_support.h
+│   │       │           └── rosidl_generator_c__visibility_control.h
+│   │       ├── rosidl_generator_c__arguments.json
+│   │       ├── rosidl_generator_cpp
+│   │       │   └── ros2_aruco_interfaces
+│   │       │       └── msg
+│   │       │           ├── aruco_markers.hpp
+│   │       │           ├── detail
+│   │       │           │   ├── aruco_markers__builder.hpp
+│   │       │           │   ├── aruco_markers__struct.hpp
+│   │       │           │   ├── aruco_markers__traits.hpp
+│   │       │           │   └── aruco_markers__type_support.hpp
+│   │       │           └── rosidl_generator_cpp__visibility_control.hpp
+│   │       ├── rosidl_generator_cpp__arguments.json
+│   │       ├── rosidl_generator_py
+│   │       │   └── ros2_aruco_interfaces
+│   │       │       ├── __init__.py
+│   │       │       ├── libros2_aruco_interfaces__rosidl_generator_py.so
+│   │       │       ├── msg
+│   │       │       │   ├── _aruco_markers.py
+│   │       │       │   ├── _aruco_markers_s.c
+│   │       │       │   └── __init__.py
+│   │       │       ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_c.c
+│   │       │       ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c
+│   │       │       ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_introspection_c.c
+│   │       │       ├── ros2_aruco_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+│   │       │       ├── ros2_aruco_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+│   │       │       └── ros2_aruco_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+│   │       ├── rosidl_generator_py__arguments.json
+│   │       ├── rosidl_typesupport_c
+│   │       │   └── ros2_aruco_interfaces
+│   │       │       └── msg
+│   │       │           └── aruco_markers__type_support.cpp
+│   │       ├── rosidl_typesupport_c__arguments.json
+│   │       ├── rosidl_typesupport_cpp
+│   │       │   └── ros2_aruco_interfaces
+│   │       │       └── msg
+│   │       │           └── aruco_markers__type_support.cpp
+│   │       ├── rosidl_typesupport_cpp__arguments.json
+│   │       ├── rosidl_typesupport_fastrtps_c
+│   │       │   └── ros2_aruco_interfaces
+│   │       │       └── msg
+│   │       │           ├── detail
+│   │       │           │   ├── aruco_markers__rosidl_typesupport_fastrtps_c.h
+│   │       │           │   └── aruco_markers__type_support_c.cpp
+│   │       │           └── rosidl_typesupport_fastrtps_c__visibility_control.h
+│   │       ├── rosidl_typesupport_fastrtps_c__arguments.json
+│   │       ├── rosidl_typesupport_fastrtps_cpp
+│   │       │   └── ros2_aruco_interfaces
+│   │       │       └── msg
+│   │       │           ├── detail
+│   │       │           │   ├── aruco_markers__rosidl_typesupport_fastrtps_cpp.hpp
+│   │       │           │   └── dds_fastrtps
+│   │       │           │       └── aruco_markers__type_support.cpp
+│   │       │           └── rosidl_typesupport_fastrtps_cpp__visibility_control.h
+│   │       ├── rosidl_typesupport_fastrtps_cpp__arguments.json
+│   │       ├── rosidl_typesupport_introspection_c
+│   │       │   └── ros2_aruco_interfaces
+│   │       │       └── msg
+│   │       │           ├── detail
+│   │       │           │   ├── aruco_markers__rosidl_typesupport_introspection_c.h
+│   │       │           │   └── aruco_markers__type_support.c
+│   │       │           └── rosidl_typesupport_introspection_c__visibility_control.h
+│   │       ├── rosidl_typesupport_introspection_c__arguments.json
+│   │       ├── rosidl_typesupport_introspection_cpp
+│   │       │   └── ros2_aruco_interfaces
+│   │       │       └── msg
+│   │       │           └── detail
+│   │       │               ├── aruco_markers__rosidl_typesupport_introspection_cpp.hpp
+│   │       │               └── aruco_markers__type_support.cpp
+│   │       └── rosidl_typesupport_introspection_cpp__arguments.json
+│   ├── install
+│   │   ├── COLCON_IGNORE
+│   │   ├── local_setup.bash
+│   │   ├── local_setup.ps1
+│   │   ├── local_setup.sh
+│   │   ├── _local_setup_util_ps1.py
+│   │   ├── _local_setup_util_sh.py
+│   │   ├── local_setup.zsh
+│   │   ├── morpheus_control
+│   │   │   ├── lib
+│   │   │   │   └── morpheus_control
+│   │   │   │       ├── morpheus_control.launch.py
+│   │   │   │       └── morpheus_control.py
+│   │   │   └── share
+│   │   │       ├── ament_index
+│   │   │       │   └── resource_index
+│   │   │       │       ├── package_run_dependencies
+│   │   │       │       │   └── morpheus_control
+│   │   │       │       ├── packages
+│   │   │       │       │   └── morpheus_control
+│   │   │       │       └── parent_prefix_path
+│   │   │       │           └── morpheus_control
+│   │   │       ├── colcon-core
+│   │   │       │   └── packages
+│   │   │       │       └── morpheus_control
+│   │   │       └── morpheus_control
+│   │   │           ├── cmake
+│   │   │           │   ├── morpheus_controlConfig.cmake
+│   │   │           │   └── morpheus_controlConfig-version.cmake
+│   │   │           ├── environment
+│   │   │           │   ├── ament_prefix_path.dsv
+│   │   │           │   ├── ament_prefix_path.sh
+│   │   │           │   ├── path.dsv
+│   │   │           │   └── path.sh
+│   │   │           ├── hook
+│   │   │           │   ├── cmake_prefix_path.dsv
+│   │   │           │   ├── cmake_prefix_path.ps1
+│   │   │           │   └── cmake_prefix_path.sh
+│   │   │           ├── launch
+│   │   │           │   └── morpheus_control.launch.py
+│   │   │           ├── local_setup.bash
+│   │   │           ├── local_setup.dsv
+│   │   │           ├── local_setup.sh
+│   │   │           ├── local_setup.zsh
+│   │   │           ├── package.bash
+│   │   │           ├── package.dsv
+│   │   │           ├── package.ps1
+│   │   │           ├── package.sh
+│   │   │           ├── package.xml
+│   │   │           ├── package.zsh
+│   │   │           └── scripts
+│   │   │               └── morpheus_control.py
+│   │   ├── morpheus_description
+│   │   │   └── share
+│   │   │       ├── ament_index
+│   │   │       │   └── resource_index
+│   │   │       │       ├── package_run_dependencies
+│   │   │       │       │   └── morpheus_description
+│   │   │       │       ├── packages
+│   │   │       │       │   └── morpheus_description
+│   │   │       │       └── parent_prefix_path
+│   │   │       │           └── morpheus_description
+│   │   │       ├── colcon-core
+│   │   │       │   └── packages
+│   │   │       │       └── morpheus_description
+│   │   │       └── morpheus_description
+│   │   │           ├── cmake
+│   │   │           │   ├── morpheus_descriptionConfig.cmake
+│   │   │           │   └── morpheus_descriptionConfig-version.cmake
+│   │   │           ├── environment
+│   │   │           │   ├── ament_prefix_path.dsv
+│   │   │           │   ├── ament_prefix_path.sh
+│   │   │           │   ├── path.dsv
+│   │   │           │   └── path.sh
+│   │   │           ├── hook
+│   │   │           │   ├── cmake_prefix_path.dsv
+│   │   │           │   ├── cmake_prefix_path.ps1
+│   │   │           │   └── cmake_prefix_path.sh
+│   │   │           ├── local_setup.bash
+│   │   │           ├── local_setup.dsv
+│   │   │           ├── local_setup.sh
+│   │   │           ├── local_setup.zsh
+│   │   │           ├── package.bash
+│   │   │           ├── package.dsv
+│   │   │           ├── package.ps1
+│   │   │           ├── package.sh
+│   │   │           ├── package.xml
+│   │   │           ├── package.zsh
+│   │   │           ├── urdf
+│   │   │           │   ├── 01_robot_description
+│   │   │           │   │   ├── meshes
+│   │   │           │   │   │   ├── dae
+│   │   │           │   │   │   │   ├── arm_base.dae
+│   │   │           │   │   │   │   ├── chassis.dae
+│   │   │           │   │   │   │   ├── drill.dae
+│   │   │           │   │   │   │   ├── elbow.dae
+│   │   │           │   │   │   │   ├── gripper_left.dae
+│   │   │           │   │   │   │   ├── gripper_right.dae
+│   │   │           │   │   │   │   ├── os0_lidar.dae
+│   │   │           │   │   │   │   ├── shaft.dae
+│   │   │           │   │   │   │   ├── shoulder.dae
+│   │   │           │   │   │   │   ├── steering.dae
+│   │   │           │   │   │   │   ├── strut.dae
+│   │   │           │   │   │   │   ├── wheel.dae
+│   │   │           │   │   │   │   ├── wrist_1.dae
+│   │   │           │   │   │   │   ├── wrist_2.dae
+│   │   │           │   │   │   │   └── wrist_3.dae
+│   │   │           │   │   │   └── stl
+│   │   │           │   │   │       ├── arm_base.stl
+│   │   │           │   │   │       ├── chassis.stl
+│   │   │           │   │   │       ├── drill.stl
+│   │   │           │   │   │       ├── elbow.stl
+│   │   │           │   │   │       ├── gripper_left.stl
+│   │   │           │   │   │       ├── gripper_right.stl
+│   │   │           │   │   │       ├── os0_lidar.stl
+│   │   │           │   │   │       ├── sample_box.stl
+│   │   │           │   │   │       ├── shaft.stl
+│   │   │           │   │   │       ├── shoulder.stl
+│   │   │           │   │   │       ├── steering.stl
+│   │   │           │   │   │       ├── strut.stl
+│   │   │           │   │   │       ├── wheel.stl
+│   │   │           │   │   │       ├── wrist_1.stl
+│   │   │           │   │   │       ├── wrist_2.stl
+│   │   │           │   │   │       ├── wrist_3.stl
+│   │   │           │   │   │       ├── ZED2i.stl
+│   │   │           │   │   │       └── ZEDM.stl
+│   │   │           │   │   ├── morpheus_isaac.urdf
+│   │   │           │   │   ├── robot_description.macro.xacro
+│   │   │           │   │   └── robot_description.xacro
+│   │   │           │   ├── 02_gazebo
+│   │   │           │   │   └── gazebo.xacro
+│   │   │           │   ├── 03_ros2_control
+│   │   │           │   │   ├── morpheus_control.yaml
+│   │   │           │   │   └── ros2_control.xacro
+│   │   │           │   ├── 04_templates
+│   │   │           │   │   ├── base_link.macro.xacro
+│   │   │           │   │   ├── base_link.template.xacro
+│   │   │           │   │   ├── gazebo.new.xacro
+│   │   │           │   │   ├── gazebo.template.xacro
+│   │   │           │   │   ├── robot_description.new.xacro
+│   │   │           │   │   ├── robot_description.template.xacro
+│   │   │           │   │   ├── ros2_control.new.xacro
+│   │   │           │   │   └── ros2_control.template.xacro
+│   │   │           │   ├── 05_save_files
+│   │   │           │   │   └── morpheus_simplified
+│   │   │           │   │       ├── gazebo.xacro
+│   │   │           │   │       ├── robot_description.xacro
+│   │   │           │   │       └── ros2_control.xacro
+│   │   │           │   ├── robot.urdf
+│   │   │           │   └── robot.xacro
+│   │   │           └── user_interface
+│   │   │               ├── config
+│   │   │               │   ├── default.rviz
+│   │   │               │   └── urdf_import.rviz
+│   │   │               ├── config_dialog.ui
+│   │   │               ├── default.rviz
+│   │   │               ├── gazebo_sensors
+│   │   │               │   ├── gazebo_sensors.py
+│   │   │               │   └── packages
+│   │   │               │       ├── camera.py
+│   │   │               │       ├── force_torque.py
+│   │   │               │       ├── functions.py
+│   │   │               │       ├── imu.py
+│   │   │               │       └── lidar.py
+│   │   │               ├── gui.py
+│   │   │               ├── gui.ui
+│   │   │               ├── readMe.txt
+│   │   │               ├── robot_description
+│   │   │               │   ├── packages
+│   │   │               │   │   ├── functions.py
+│   │   │               │   │   ├── user_interface.py
+│   │   │               │   │   └── xacro.py
+│   │   │               │   └── robot_description.py
+│   │   │               ├── ros2
+│   │   │               │   └── ros2_tools.py
+│   │   │               ├── ros2_control
+│   │   │               │   ├── gui.py
+│   │   │               │   └── ros2_control.py
+│   │   │               └── urdf_import
+│   │   │                   ├── packages
+│   │   │                   │   ├── functions.py
+│   │   │                   │   └── user_interface.py
+│   │   │                   └── urdf_importer.py
+│   │   ├── morpheus_simulation
+│   │   │   └── share
+│   │   │       ├── ament_index
+│   │   │       │   └── resource_index
+│   │   │       │       ├── package_run_dependencies
+│   │   │       │       │   └── morpheus_simulation
+│   │   │       │       ├── packages
+│   │   │       │       │   └── morpheus_simulation
+│   │   │       │       └── parent_prefix_path
+│   │   │       │           └── morpheus_simulation
+│   │   │       ├── colcon-core
+│   │   │       │   └── packages
+│   │   │       │       └── morpheus_simulation
+│   │   │       └── morpheus_simulation
+│   │   │           ├── cmake
+│   │   │           │   ├── morpheus_simulationConfig.cmake
+│   │   │           │   └── morpheus_simulationConfig-version.cmake
+│   │   │           ├── environment
+│   │   │           │   ├── ament_prefix_path.dsv
+│   │   │           │   ├── ament_prefix_path.sh
+│   │   │           │   ├── path.dsv
+│   │   │           │   └── path.sh
+│   │   │           ├── hook
+│   │   │           │   ├── cmake_prefix_path.dsv
+│   │   │           │   ├── cmake_prefix_path.ps1
+│   │   │           │   └── cmake_prefix_path.sh
+│   │   │           ├── launch
+│   │   │           │   ├── morpheus_config.rviz
+│   │   │           │   └── morpheus_spawn.launch.py
+│   │   │           ├── local_setup.bash
+│   │   │           ├── local_setup.dsv
+│   │   │           ├── local_setup.sh
+│   │   │           ├── local_setup.zsh
+│   │   │           ├── package.bash
+│   │   │           ├── package.dsv
+│   │   │           ├── package.ps1
+│   │   │           ├── package.sh
+│   │   │           ├── package.xml
+│   │   │           ├── package.zsh
+│   │   │           └── worlds
+│   │   │               ├── aruco_box
+│   │   │               │   ├── meshes
+│   │   │               │   │   ├── DAE
+│   │   │               │   │   │   ├── aruco.dae
+│   │   │               │   │   │   ├── marker_0001.png
+│   │   │               │   │   │   ├── marker_0002.png
+│   │   │               │   │   │   ├── marker_0003.png
+│   │   │               │   │   │   ├── marker_0004.png
+│   │   │               │   │   │   ├── marker_0005.png
+│   │   │               │   │   │   └── marker_0006.png
+│   │   │               │   │   ├── OBJ
+│   │   │               │   │   │   ├── aruco.mtl
+│   │   │               │   │   │   └── aruco.obj
+│   │   │               │   │   └── STL
+│   │   │               │   │       └── aruco.stl
+│   │   │               │   ├── model.config
+│   │   │               │   └── model.sdf
+│   │   │               ├── empty_world.sdf
+│   │   │               ├── marsyard2022.sdf
+│   │   │               ├── marsyard2022_terrain
+│   │   │               │   ├── dem
+│   │   │               │   │   ├── flat_normal.png
+│   │   │               │   │   ├── mars_4096_hm.geaendert.png
+│   │   │               │   │   ├── mars_4096_hm_inverted80.png
+│   │   │               │   │   ├── mars_4096_hm_inverted.geaendert.png
+│   │   │               │   │   ├── mars_4096_hm_inverted.png
+│   │   │               │   │   ├── mars_4096_hm.png
+│   │   │               │   │   └── mars_4096.png
+│   │   │               │   ├── model.config
+│   │   │               │   └── model.sdf
+│   │   │               └── stairs
+│   │   │                   ├── meshes
+│   │   │                   │   └── stairs.stl
+│   │   │                   ├── model.config
+│   │   │                   └── model.sdf
+│   │   ├── ros2_aruco
+│   │   │   ├── lib
+│   │   │   │   ├── python3.10
+│   │   │   │   │   └── site-packages
+│   │   │   │   │       ├── ros2_aruco
+│   │   │   │   │       │   ├── aruco_generate_marker.py
+│   │   │   │   │       │   ├── aruco_node.py
+│   │   │   │   │       │   └── __init__.py
+│   │   │   │   │       └── ros2_aruco-0.1.0-py3.10.egg-info
+│   │   │   │   │           ├── dependency_links.txt
+│   │   │   │   │           ├── entry_points.txt
+│   │   │   │   │           ├── PKG-INFO
+│   │   │   │   │           ├── requires.txt
+│   │   │   │   │           ├── SOURCES.txt
+│   │   │   │   │           ├── top_level.txt
+│   │   │   │   │           └── zip-safe
+│   │   │   │   └── ros2_aruco
+│   │   │   │       ├── aruco_generate_marker
+│   │   │   │       └── aruco_node
+│   │   │   └── share
+│   │   │       ├── ament_index
+│   │   │       │   └── resource_index
+│   │   │       │       └── packages
+│   │   │       │           └── ros2_aruco
+│   │   │       ├── colcon-core
+│   │   │       │   └── packages
+│   │   │       │       └── ros2_aruco
+│   │   │       └── ros2_aruco
+│   │   │           ├── config
+│   │   │           │   └── aruco_parameters.yaml
+│   │   │           ├── hook
+│   │   │           │   ├── ament_prefix_path.dsv
+│   │   │           │   ├── ament_prefix_path.ps1
+│   │   │           │   ├── ament_prefix_path.sh
+│   │   │           │   ├── pythonpath.dsv
+│   │   │           │   ├── pythonpath.ps1
+│   │   │           │   └── pythonpath.sh
+│   │   │           ├── launch
+│   │   │           │   └── aruco_recognition.launch.py
+│   │   │           ├── package.bash
+│   │   │           ├── package.dsv
+│   │   │           ├── package.ps1
+│   │   │           ├── package.sh
+│   │   │           ├── package.xml
+│   │   │           └── package.zsh
+│   │   ├── ros2_aruco_interfaces
+│   │   │   ├── include
+│   │   │   │   └── ros2_aruco_interfaces
+│   │   │   │       └── ros2_aruco_interfaces
+│   │   │   │           └── msg
+│   │   │   │               ├── aruco_markers.h
+│   │   │   │               ├── aruco_markers.hpp
+│   │   │   │               ├── detail
+│   │   │   │               │   ├── aruco_markers__builder.hpp
+│   │   │   │               │   ├── aruco_markers__functions.c
+│   │   │   │               │   ├── aruco_markers__functions.h
+│   │   │   │               │   ├── aruco_markers__rosidl_typesupport_fastrtps_c.h
+│   │   │   │               │   ├── aruco_markers__rosidl_typesupport_fastrtps_cpp.hpp
+│   │   │   │               │   ├── aruco_markers__rosidl_typesupport_introspection_c.h
+│   │   │   │               │   ├── aruco_markers__rosidl_typesupport_introspection_cpp.hpp
+│   │   │   │               │   ├── aruco_markers__struct.h
+│   │   │   │               │   ├── aruco_markers__struct.hpp
+│   │   │   │               │   ├── aruco_markers__traits.hpp
+│   │   │   │               │   ├── aruco_markers__type_support.c
+│   │   │   │               │   ├── aruco_markers__type_support.cpp
+│   │   │   │               │   ├── aruco_markers__type_support.h
+│   │   │   │               │   ├── aruco_markers__type_support.hpp
+│   │   │   │               │   └── dds_fastrtps
+│   │   │   │               ├── rosidl_generator_cpp__visibility_control.hpp
+│   │   │   │               ├── rosidl_generator_c__visibility_control.h
+│   │   │   │               ├── rosidl_typesupport_fastrtps_cpp__visibility_control.h
+│   │   │   │               ├── rosidl_typesupport_fastrtps_c__visibility_control.h
+│   │   │   │               └── rosidl_typesupport_introspection_c__visibility_control.h
+│   │   │   ├── lib
+│   │   │   │   ├── libros2_aruco_interfaces__rosidl_generator_c.so
+│   │   │   │   ├── libros2_aruco_interfaces__rosidl_generator_py.so
+│   │   │   │   ├── libros2_aruco_interfaces__rosidl_typesupport_cpp.so
+│   │   │   │   ├── libros2_aruco_interfaces__rosidl_typesupport_c.so
+│   │   │   │   ├── libros2_aruco_interfaces__rosidl_typesupport_fastrtps_cpp.so
+│   │   │   │   ├── libros2_aruco_interfaces__rosidl_typesupport_fastrtps_c.so
+│   │   │   │   ├── libros2_aruco_interfaces__rosidl_typesupport_introspection_cpp.so
+│   │   │   │   └── libros2_aruco_interfaces__rosidl_typesupport_introspection_c.so
+│   │   │   ├── local
+│   │   │   │   └── lib
+│   │   │   │       └── python3.10
+│   │   │   │           └── dist-packages
+│   │   │   │               ├── ros2_aruco_interfaces
+│   │   │   │               │   ├── __init__.py
+│   │   │   │               │   ├── libros2_aruco_interfaces__rosidl_generator_py.so
+│   │   │   │               │   ├── msg
+│   │   │   │               │   │   ├── _aruco_markers.py
+│   │   │   │               │   │   ├── _aruco_markers_s.c
+│   │   │   │               │   │   └── __init__.py
+│   │   │   │               │   ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_c.c
+│   │   │   │               │   ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_fastrtps_c.c
+│   │   │   │               │   ├── _ros2_aruco_interfaces_s.ep.rosidl_typesupport_introspection_c.c
+│   │   │   │               │   ├── ros2_aruco_interfaces_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+│   │   │   │               │   ├── ros2_aruco_interfaces_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+│   │   │   │               │   └── ros2_aruco_interfaces_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+│   │   │   │               └── ros2_aruco_interfaces-0.1.0-py3.10.egg-info
+│   │   │   │                   ├── dependency_links.txt
+│   │   │   │                   ├── PKG-INFO
+│   │   │   │                   ├── SOURCES.txt
+│   │   │   │                   └── top_level.txt
+│   │   │   └── share
+│   │   │       ├── ament_index
+│   │   │       │   └── resource_index
+│   │   │       │       ├── package_run_dependencies
+│   │   │       │       │   └── ros2_aruco_interfaces
+│   │   │       │       ├── packages
+│   │   │       │       │   └── ros2_aruco_interfaces
+│   │   │       │       ├── parent_prefix_path
+│   │   │       │       │   └── ros2_aruco_interfaces
+│   │   │       │       └── rosidl_interfaces
+│   │   │       │           └── ros2_aruco_interfaces
+│   │   │       ├── colcon-core
+│   │   │       │   └── packages
+│   │   │       │       └── ros2_aruco_interfaces
+│   │   │       └── ros2_aruco_interfaces
+│   │   │           ├── cmake
+│   │   │           │   ├── ament_cmake_export_dependencies-extras.cmake
+│   │   │           │   ├── ament_cmake_export_include_directories-extras.cmake
+│   │   │           │   ├── ament_cmake_export_libraries-extras.cmake
+│   │   │           │   ├── ament_cmake_export_targets-extras.cmake
+│   │   │           │   ├── export_ros2_aruco_interfaces__rosidl_generator_cExport.cmake
+│   │   │           │   ├── export_ros2_aruco_interfaces__rosidl_generator_cExport-noconfig.cmake
+│   │   │           │   ├── export_ros2_aruco_interfaces__rosidl_generator_cppExport.cmake
+│   │   │           │   ├── export_ros2_aruco_interfaces__rosidl_generator_pyExport.cmake
+│   │   │           │   ├── export_ros2_aruco_interfaces__rosidl_generator_pyExport-noconfig.cmake
+│   │   │           │   ├── export_ros2_aruco_interfaces__rosidl_typesupport_fastrtps_cExport.cmake
+│   │   │           │   ├── export_ros2_aruco_interfaces__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+│   │   │           │   ├── export_ros2_aruco_interfaces__rosidl_typesupport_fastrtps_cppExport.cmake
+│   │   │           │   ├── export_ros2_aruco_interfaces__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+│   │   │           │   ├── ros2_aruco_interfacesConfig.cmake
+│   │   │           │   ├── ros2_aruco_interfacesConfig-version.cmake
+│   │   │           │   ├── ros2_aruco_interfaces__rosidl_typesupport_cExport.cmake
+│   │   │           │   ├── ros2_aruco_interfaces__rosidl_typesupport_cExport-noconfig.cmake
+│   │   │           │   ├── ros2_aruco_interfaces__rosidl_typesupport_cppExport.cmake
+│   │   │           │   ├── ros2_aruco_interfaces__rosidl_typesupport_cppExport-noconfig.cmake
+│   │   │           │   ├── ros2_aruco_interfaces__rosidl_typesupport_introspection_cExport.cmake
+│   │   │           │   ├── ros2_aruco_interfaces__rosidl_typesupport_introspection_cExport-noconfig.cmake
+│   │   │           │   ├── ros2_aruco_interfaces__rosidl_typesupport_introspection_cppExport.cmake
+│   │   │           │   ├── ros2_aruco_interfaces__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+│   │   │           │   ├── rosidl_cmake_export_typesupport_libraries-extras.cmake
+│   │   │           │   ├── rosidl_cmake_export_typesupport_targets-extras.cmake
+│   │   │           │   └── rosidl_cmake-extras.cmake
+│   │   │           ├── environment
+│   │   │           │   ├── ament_prefix_path.dsv
+│   │   │           │   ├── ament_prefix_path.sh
+│   │   │           │   ├── library_path.dsv
+│   │   │           │   ├── library_path.sh
+│   │   │           │   ├── path.dsv
+│   │   │           │   ├── path.sh
+│   │   │           │   ├── pythonpath.dsv
+│   │   │           │   └── pythonpath.sh
+│   │   │           ├── hook
+│   │   │           │   ├── cmake_prefix_path.dsv
+│   │   │           │   ├── cmake_prefix_path.ps1
+│   │   │           │   ├── cmake_prefix_path.sh
+│   │   │           │   ├── ld_library_path_lib.dsv
+│   │   │           │   ├── ld_library_path_lib.ps1
+│   │   │           │   └── ld_library_path_lib.sh
+│   │   │           ├── local_setup.bash
+│   │   │           ├── local_setup.dsv
+│   │   │           ├── local_setup.sh
+│   │   │           ├── local_setup.zsh
+│   │   │           ├── msg
+│   │   │           │   ├── ArucoMarkers.idl
+│   │   │           │   └── ArucoMarkers.msg
+│   │   │           ├── package.bash
+│   │   │           ├── package.dsv
+│   │   │           ├── package.ps1
+│   │   │           ├── package.sh
+│   │   │           ├── package.xml
+│   │   │           └── package.zsh
+│   │   ├── setup.bash
+│   │   ├── setup.ps1
+│   │   ├── setup.sh
+│   │   └── setup.zsh
+│   ├── log
+│   │   ├── build_2025-06-19_17-39-12
+│   │   │   ├── events.log
+│   │   │   ├── logger_all.log
+│   │   │   ├── morpheus_control
+│   │   │   │   ├── command.log
+│   │   │   │   ├── stderr.log
+│   │   │   │   ├── stdout.log
+│   │   │   │   ├── stdout_stderr.log
+│   │   │   │   └── streams.log
+│   │   │   ├── morpheus_description
+│   │   │   │   ├── command.log
+│   │   │   │   ├── stderr.log
+│   │   │   │   ├── stdout.log
+│   │   │   │   ├── stdout_stderr.log
+│   │   │   │   └── streams.log
+│   │   │   ├── morpheus_simulation
+│   │   │   │   ├── command.log
+│   │   │   │   ├── stderr.log
+│   │   │   │   ├── stdout.log
+│   │   │   │   ├── stdout_stderr.log
+│   │   │   │   └── streams.log
+│   │   │   ├── ros2_aruco
+│   │   │   │   ├── command.log
+│   │   │   │   ├── stderr.log
+│   │   │   │   ├── stdout.log
+│   │   │   │   ├── stdout_stderr.log
+│   │   │   │   └── streams.log
+│   │   │   └── ros2_aruco_interfaces
+│   │   │       ├── command.log
+│   │   │       ├── stderr.log
+│   │   │       ├── stdout.log
+│   │   │       ├── stdout_stderr.log
+│   │   │       └── streams.log
+│   │   ├── build_2025-06-19_17-59-33
+│   │   │   ├── events.log
+│   │   │   ├── logger_all.log
+│   │   │   ├── morpheus_control
+│   │   │   │   ├── command.log
+│   │   │   │   ├── stderr.log
+│   │   │   │   ├── stdout.log
+│   │   │   │   ├── stdout_stderr.log
+│   │   │   │   └── streams.log
+│   │   │   ├── morpheus_description
+│   │   │   │   ├── command.log
+│   │   │   │   ├── stderr.log
+│   │   │   │   ├── stdout.log
+│   │   │   │   ├── stdout_stderr.log
+│   │   │   │   └── streams.log
+│   │   │   ├── morpheus_simulation
+│   │   │   │   ├── command.log
+│   │   │   │   ├── stderr.log
+│   │   │   │   ├── stdout.log
+│   │   │   │   ├── stdout_stderr.log
+│   │   │   │   └── streams.log
+│   │   │   ├── ros2_aruco
+│   │   │   │   ├── command.log
+│   │   │   │   ├── stderr.log
+│   │   │   │   ├── stdout.log
+│   │   │   │   ├── stdout_stderr.log
+│   │   │   │   └── streams.log
+│   │   │   └── ros2_aruco_interfaces
+│   │   │       ├── command.log
+│   │   │       ├── stderr.log
+│   │   │       ├── stdout.log
+│   │   │       ├── stdout_stderr.log
+│   │   │       └── streams.log
+│   │   ├── COLCON_IGNORE
+│   │   ├── latest -> latest_build
+│   │   └── latest_build -> build_2025-06-19_17-59-33
+│   └── src
+│       ├── morpheus_control
+│       │   ├── CMakeLists.txt
+│       │   ├── launch
+│       │   │   └── morpheus_control.launch.py
+│       │   ├── package.xml
+│       │   └── scripts
+│       │       └── morpheus_control.py
+│       ├── morpheus_description
+│       │   ├── CMakeLists.txt
+│       │   ├── package.xml
+│       │   ├── urdf
+│       │   │   ├── 01_robot_description
+│       │   │   │   ├── meshes
+│       │   │   │   │   ├── dae
+│       │   │   │   │   │   ├── arm_base.dae
+│       │   │   │   │   │   ├── chassis.dae
+│       │   │   │   │   │   ├── drill.dae
+│       │   │   │   │   │   ├── elbow.dae
+│       │   │   │   │   │   ├── gripper_left.dae
+│       │   │   │   │   │   ├── gripper_right.dae
+│       │   │   │   │   │   ├── os0_lidar.dae
+│       │   │   │   │   │   ├── shaft.dae
+│       │   │   │   │   │   ├── shoulder.dae
+│       │   │   │   │   │   ├── steering.dae
+│       │   │   │   │   │   ├── strut.dae
+│       │   │   │   │   │   ├── wheel.dae
+│       │   │   │   │   │   ├── wrist_1.dae
+│       │   │   │   │   │   ├── wrist_2.dae
+│       │   │   │   │   │   └── wrist_3.dae
+│       │   │   │   │   └── stl
+│       │   │   │   │       ├── arm_base.stl
+│       │   │   │   │       ├── chassis.stl
+│       │   │   │   │       ├── drill.stl
+│       │   │   │   │       ├── elbow.stl
+│       │   │   │   │       ├── gripper_left.stl
+│       │   │   │   │       ├── gripper_right.stl
+│       │   │   │   │       ├── os0_lidar.stl
+│       │   │   │   │       ├── sample_box.stl
+│       │   │   │   │       ├── shaft.stl
+│       │   │   │   │       ├── shoulder.stl
+│       │   │   │   │       ├── steering.stl
+│       │   │   │   │       ├── strut.stl
+│       │   │   │   │       ├── wheel.stl
+│       │   │   │   │       ├── wrist_1.stl
+│       │   │   │   │       ├── wrist_2.stl
+│       │   │   │   │       ├── wrist_3.stl
+│       │   │   │   │       ├── ZED2i.stl
+│       │   │   │   │       └── ZEDM.stl
+│       │   │   │   ├── morpheus_isaac.urdf
+│       │   │   │   ├── robot_description.macro.xacro
+│       │   │   │   └── robot_description.xacro
+│       │   │   ├── 02_gazebo
+│       │   │   │   └── gazebo.xacro
+│       │   │   ├── 03_ros2_control
+│       │   │   │   ├── morpheus_control.yaml
+│       │   │   │   └── ros2_control.xacro
+│       │   │   ├── 04_templates
+│       │   │   │   ├── base_link.macro.xacro
+│       │   │   │   ├── base_link.template.xacro
+│       │   │   │   ├── gazebo.new.xacro
+│       │   │   │   ├── gazebo.template.xacro
+│       │   │   │   ├── robot_description.new.xacro
+│       │   │   │   ├── robot_description.template.xacro
+│       │   │   │   ├── ros2_control.new.xacro
+│       │   │   │   └── ros2_control.template.xacro
+│       │   │   ├── 05_save_files
+│       │   │   │   └── morpheus_simplified
+│       │   │   │       ├── gazebo.xacro
+│       │   │   │       ├── robot_description.xacro
+│       │   │   │       └── ros2_control.xacro
+│       │   │   ├── robot.urdf
+│       │   │   └── robot.xacro
+│       │   └── user_interface
+│       │       ├── config
+│       │       │   ├── default.rviz
+│       │       │   └── urdf_import.rviz
+│       │       ├── config_dialog.ui
+│       │       ├── default.rviz
+│       │       ├── gazebo_sensors
+│       │       │   ├── gazebo_sensors.py
+│       │       │   └── packages
+│       │       │       ├── camera.py
+│       │       │       ├── force_torque.py
+│       │       │       ├── functions.py
+│       │       │       ├── imu.py
+│       │       │       └── lidar.py
+│       │       ├── gui.py
+│       │       ├── gui.ui
+│       │       ├── readMe.txt
+│       │       ├── robot_description
+│       │       │   ├── packages
+│       │       │   │   ├── functions.py
+│       │       │   │   ├── user_interface.py
+│       │       │   │   └── xacro.py
+│       │       │   └── robot_description.py
+│       │       ├── ros2
+│       │       │   └── ros2_tools.py
+│       │       ├── ros2_control
+│       │       │   ├── gui.py
+│       │       │   └── ros2_control.py
+│       │       └── urdf_import
+│       │           ├── packages
+│       │           │   ├── functions.py
+│       │           │   └── user_interface.py
+│       │           └── urdf_importer.py
+│       ├── morpheus_simulation
+│       │   ├── CMakeLists.txt
+│       │   ├── launch
+│       │   │   ├── morpheus_config.rviz
+│       │   │   └── morpheus_spawn.launch.py
+│       │   ├── package.xml
+│       │   └── worlds
+│       │       ├── aruco_box
+│       │       │   ├── meshes
+│       │       │   │   ├── DAE
+│       │       │   │   │   ├── aruco.dae
+│       │       │   │   │   ├── marker_0001.png
+│       │       │   │   │   ├── marker_0002.png
+│       │       │   │   │   ├── marker_0003.png
+│       │       │   │   │   ├── marker_0004.png
+│       │       │   │   │   ├── marker_0005.png
+│       │       │   │   │   └── marker_0006.png
+│       │       │   │   ├── OBJ
+│       │       │   │   │   ├── aruco.mtl
+│       │       │   │   │   └── aruco.obj
+│       │       │   │   └── STL
+│       │       │   │       └── aruco.stl
+│       │       │   ├── model.config
+│       │       │   └── model.sdf
+│       │       ├── empty_world.sdf
+│       │       ├── marsyard2022.sdf
+│       │       ├── marsyard2022_terrain
+│       │       │   ├── dem
+│       │       │   │   ├── flat_normal.png
+│       │       │   │   ├── mars_4096_hm.geaendert.png
+│       │       │   │   ├── mars_4096_hm_inverted80.png
+│       │       │   │   ├── mars_4096_hm_inverted.geaendert.png
+│       │       │   │   ├── mars_4096_hm_inverted.png
+│       │       │   │   ├── mars_4096_hm.png
+│       │       │   │   └── mars_4096.png
+│       │       │   ├── model.config
+│       │       │   └── model.sdf
+│       │       └── stairs
+│       │           ├── meshes
+│       │           │   └── stairs.stl
+│       │           ├── model.config
+│       │           └── model.sdf
+│       └── ros2_aruco
+│           ├── LICENSE
+│           ├── README.md
+│           ├── ros2_aruco
+│           │   ├── config
+│           │   │   └── aruco_parameters.yaml
+│           │   ├── launch
+│           │   │   └── aruco_recognition.launch.py
+│           │   ├── package.xml
+│           │   ├── resource
+│           │   │   └── ros2_aruco
+│           │   ├── ros2_aruco
+│           │   │   ├── aruco_generate_marker.py
+│           │   │   ├── aruco_node.py
+│           │   │   └── __init__.py
+│           │   ├── setup.cfg
+│           │   ├── setup.py
+│           │   └── test
+│           │       ├── test_copyright.py
+│           │       ├── test_flake8.py
+│           │       └── test_pep257.py
+│           └── ros2_aruco_interfaces
+│               ├── CMakeLists.txt
+│               ├── msg
+│               │   └── ArucoMarkers.msg
+│               └── package.xml
+└── structure.txt
+
+403 directories, 1078 files

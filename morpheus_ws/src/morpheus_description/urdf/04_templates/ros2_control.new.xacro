@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <ros2_control name="morpheus_resource_manager" type="system">
+    <hardware>
+        <plugin>ign_ros2_control/IgnitionSystem</plugin>
+    </hardware>
+  </ros2_control>
+</robot>

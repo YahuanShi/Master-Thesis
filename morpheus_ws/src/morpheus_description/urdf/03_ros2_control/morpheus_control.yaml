@@ -1,0 +1,70 @@
+controller_manager:
+  ros__parameters:
+  
+    update_rate: 100  # Hz
+
+    forward_velocity_controller:
+      type: forward_command_controller/ForwardCommandController
+
+    forward_position_controller:
+      type: forward_command_controller/ForwardCommandController
+      
+    suspension_controller:
+      type: forward_command_controller/ForwardCommandController
+      
+    robotic_arm_controller:
+      type: forward_command_controller/ForwardCommandController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+forward_velocity_controller:
+  ros__parameters:
+    joints:
+      - wheel_fl_joint
+      - wheel_fr_joint
+      - wheel_rl_joint
+      - wheel_rr_joint
+    interface_name: velocity
+    command_interfaces:
+      - velocity
+    state_interfaces:
+      - position
+      - velocity
+
+forward_position_controller:
+  ros__parameters:
+    joints:
+      - steering_fl_joint
+      - steering_fr_joint
+      - steering_rl_joint
+      - steering_rr_joint
+    interface_name: position
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+ 
+suspension_controller:
+  ros__parameters:
+    joints:
+      - shaft_left_joint
+    interface_name: position
+
+robotic_arm_controller:
+  ros__parameters:
+    joints:
+      - arm_base_joint
+      - shoulder_joint
+      - elbow_joint
+      - wrist_1_joint
+      - wrist_2_joint
+      - wrist_3_joint
+      - gripper_left_joint
+    interface_name: position
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+

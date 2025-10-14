@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+	<xacro:macro name="link_viz_origin" params="xyz rpy">
+		<origin xyz="${xyz}" rpy = "${rpy}"/>
+	</xacro:macro>
+
+	<xacro:macro name="link_col_origin" params="xyz rpy">
+		<origin xyz="${xyz}" rpy = "${rpy}"/>
+	</xacro:macro>		
+
+	<xacro:macro name="link_viz_shape" params="*shape">
+		<xacro:insert_block name = "shape"/>
+	</xacro:macro>
+  
+	<xacro:macro name="link_col_shape" params="*shape">
+		<xacro:insert_block name = "shape"/>
+	</xacro:macro>
+
+	<xacro:macro name="link_center_of_mass" params="xyz">
+		<origin xyz="${xyz}"/>
+	</xacro:macro>
+
+	<xacro:macro name="link_inertia" params="ixx ixy ixz iyy iyz izz">
+		<inertia ixx="${ixx}" ixy="${ixy}" ixz="${ixz}" iyy="${iyy}" iyz="${iyz}" izz="${izz}" />
+	</xacro:macro>
+
+	<xacro:macro name="link_color" params="rgba">
+		<color rgba="${rgba}"/>
+	</xacro:macro>
+
+	<xacro:macro name="joint_origin" params="xyz rpy">
+		<origin xyz="${xyz}" rpy="${rpy}"/>
+	</xacro:macro>
+
+	<xacro:macro name="joint_axis_of_rotation" params="xyz">
+		<axis xyz="${xyz}"/>
+	</xacro:macro>
+
+	<xacro:macro name="joint_limits" params="effort velocity lower upper">
+		<limit effort="${effort}" velocity="${velocity}"  lower="${lower}" upper="${upper}" />
+	</xacro:macro>
+
+	<xacro:macro name="joint_dynamics" params="damping friction">
+		<dynamics damping="${damping}" friction="${friction}"/>
+	</xacro:macro>
+
+    <xacro:macro name="joint_mimic" params="joint multiplier offset">
+		<mimic joint="${joint}_joint" multiplier="${multiplier}" offset = "${offset}"/>
+	</xacro:macro>
+
+	<xacro:macro name = "part" params = "name type mass parent mimic color *link_viz_origin *link_col_origin *link_viz_shape *link_col_shape *link_color *link_center_of_mass *link_inertia *joint_origin *joint_axis_of_rotation *joint_limits *joint_dynamics *joint_mimic">
+		
+		<link name="${name}_link">
+			<visual>
+				<xacro:insert_block name = "link_viz_origin"/>
+				<geometry>
+					<xacro:insert_block name = "link_viz_shape"/>
+				</geometry>
+				<xacro:if value="${color == 1}">
+					<material name="">
+						<xacro:insert_block name = "link_color"/>
+					</material>
+				</xacro:if>
+			</visual>
+			<collision>
+				<xacro:insert_block name = "link_col_origin"/>
+				<geometry>
+					<xacro:insert_block name = "link_col_shape"/>
+				</geometry>
+			</collision>
+			<inertial>
+				<xacro:insert_block name = "link_center_of_mass"/>
+				<mass value="${mass}"/>
+				<xacro:insert_block name = "link_inertia"/>
+			</inertial>
+		</link>
+
+		<joint name="${name}_joint" type="${type}">
+			<xacro:insert_block name="joint_origin"/>
+			<parent link="${parent}_link"/>
+			<child link="${name}_link"/>
+			<xacro:if value="${type != 'fixed'}">
+				<xacro:insert_block name="joint_axis_of_rotation"/>
+				<xacro:insert_block name="joint_limits"/>
+				<xacro:insert_block name="joint_dynamics"/>
+				<xacro:if value="${mimic == 1}">
+					<xacro:insert_block name="joint_mimic"/>
+				</xacro:if>
+			</xacro:if>
+		</joint>
+
+	</xacro:macro>
+
+</robot>

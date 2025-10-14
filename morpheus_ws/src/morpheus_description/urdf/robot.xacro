@@ -1,0 +1,7 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="morpheus_rover">
+
+  <xacro:include filename="$(find morpheus_description)/urdf/01_robot_description/robot_description.xacro"/>
+  <xacro:include filename="$(find morpheus_description)/urdf/02_gazebo/gazebo.xacro"/>
+  <xacro:include filename="$(find morpheus_description)/urdf/03_ros2_control/ros2_control.xacro"/>
+  
+</robot>

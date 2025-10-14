@@ -1,0 +1,17 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find morpheus_description)/urdf/01_robot_description/robot_description.macro.xacro" />
+  <xacro:include filename="$(find morpheus_description)/urdf/04_templates/base_link.macro.xacro" />
+  <xacro:base name="base" mass="1.0" empty="1" color="1">
+    <xacro:link_viz_origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+    <xacro:link_col_origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+    <xacro:link_viz_shape>
+      <box size="1.0 0.5 0.5" />
+    </xacro:link_viz_shape>
+    <xacro:link_col_shape>
+      <box size="0.5 0.5 0.5" />
+    </xacro:link_col_shape>
+    <xacro:link_color rgba = "1.0 0.0 0.0 1.0"/>
+    <xacro:link_center_of_mass xyz="0.0 0.0 0.0" />
+    <xacro:link_inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+  </xacro:base>
+</robot>

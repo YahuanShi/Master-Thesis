@@ -1,0 +1,92 @@
+<robot>
+  <gazebo>
+    <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+      <parameters>$(find morpheus_description)/urdf/03_ros2_control/morpheus_control.yaml</parameters>
+    </plugin>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+  </gazebo>
+  <gazebo reference="os0_lidar_link">
+    <sensor name="os0_lidar" type="gpu_lidar">
+      <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      <topic>/scan</topic>
+      <update_rate>10</update_rate>
+      <always_on>True</always_on>
+      <visualize>True</visualize>
+      <gz_frame_id>chassis_link</gz_frame_id>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>128.0</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-3.16</min_angle>
+            <max_angle>3.1400218572629983</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>128</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.78</min_angle>
+            <max_angle>78</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>1.0</min>
+          <max>10.0</max>
+        </range>
+      </lidar>
+    </sensor>
+  </gazebo>
+  <gazebo reference="chassis_link">
+    <sensor name="imu_1" type="imu">
+      <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      <gz_frame_id>chassis_link</gz_frame_id>
+      <topic>/imu</topic>
+      <update_rate>10</update_rate>
+      <always_on>True</always_on>
+      <visualize>True</visualize>
+    </sensor>
+  </gazebo>
+  <gazebo reference="zed_mini_link">
+    <sensor name="zed_mini" type="camera">
+      <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      <gz_frame_id>chassis_link</gz_frame_id>
+      <topic>/camera_mini</topic>
+      <update_rate>10</update_rate>
+      <always_on>False</always_on>
+      <visualize>False</visualize>
+      <camera>
+        <horizontal_fov>1.78</horizontal_fov>
+        <image>
+          <width>1920.00</width>
+          <height>1080.00</height>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>10.00</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+  <gazebo reference="zed_2i_link">
+    <sensor name="zed_2i" type="camera">
+      <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      <gz_frame_id>chassis_link</gz_frame_id>
+      <topic>/camera_2i</topic>
+      <update_rate>10</update_rate>
+      <always_on>True</always_on>
+      <visualize>True</visualize>
+      <camera>
+        <horizontal_fov>1.91</horizontal_fov>
+        <image>
+          <width>1920.00</width>
+          <height>1080.00</height>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>40.00</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+</robot>

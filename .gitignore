@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build / Colcon / CMake
+build/
+install/
+log/
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/CTestTestfile.cmake
+**/CTestCustom.cmake
+**/Makefile
+**/CMakeOutput.log
+**/CMakeDirectoryInformation.cmake
+**/progress.marks
+**/TargetDirectories.txt
+.colcon*
+**/colcon_*
+
+# ROS 2 generated / eggs
+**/*.egg-info/
+**/local/lib/python*/
+**/lib/*.so
+**/lib/*.a
+
+# Misc
+*.swp
+*.swo
+.DS_Store

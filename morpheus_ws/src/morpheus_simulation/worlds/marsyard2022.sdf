@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <world name="marsyard2022">
+    <physics name='1ms' type='bullet'>
+      <max_step_size>0.01</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>100</real_time_update_rate>
+      <max_contacts>10</max_contacts>
+    </physics>
+    <scene>
+      <ambient>1.0 1.0 1.0</ambient>
+      <background>0.8 0.8 0.8</background>
+    </scene>
+    <plugin
+      filename="ignition-gazebo-physics-system"
+      name="ignition::gazebo::systems::Physics">
+    </plugin>
+    <plugin
+      filename="ignition-gazebo-user-commands-system"
+      name="ignition::gazebo::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="ignition-gazebo-scene-broadcaster-system"
+      name="ignition::gazebo::systems::SceneBroadcaster">
+    </plugin>
+
+    <!-- <physics name='1ms' type='ignored'>
+      <dart>
+        <collision_detector>bullet</collision_detector>
+      </dart>
+    </physics> -->
+    <!-- <physics type="ode">
+      <ode>
+        <solver>
+          IMPORTANT for skid steering to properly work
+          <friction_model>cone_model</friction_model>
+
+          <island_threads>6</island_threads>
+        </solver>
+      </ode>
+    </physics> -->
+
+    <!-- <light name='sun' type='directional'>
+      <pose>0 0 10 0 0 0.01</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <cast_shadows>1</cast_shadows>
+      <direction>-0.2 -1.0 -1.0</direction>
+    </light> -->
+
+    <include>
+      <uri>model://marsyard2022_terrain</uri>
+    </include>
+
+    <include>
+      <pose>
+        -5 -5 2.25 0 0 0
+      </pose>
+      <name>ar_box_1</name>
+      <uri>model://aruco_box</uri>
+    </include>
+
+    <include>
+      <pose>5 5 2.25 0 0 0</pose>
+      <name>ar_box_2</name>
+      <uri>model://aruco_box</uri>
+    </include>
+
+    <include>
+      <pose>10 10 2.25 0 0 0</pose>
+      <name>ar_box_3</name>
+      <uri>model://aruco_box</uri>
+    </include>
+
+    <include>
+      <pose>-10 10 2.25 0 0 0</pose>
+      <name>ar_box_4</name>
+      <uri>model://aruco_box</uri>
+    </include>
+
+    <include>
+      <pose>-3 3 2.25 0 0 0</pose>
+      <name>ar_box_5</name>
+      <uri>model://aruco_box</uri>
+    </include>
+
+    <include>
+      <pose>6 -6 2.25 0 0 0</pose>
+      <name>ar_box_6</name>
+      <uri>model://aruco_box</uri>
+    </include>
+  </world>
+</sdf>

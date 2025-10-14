@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+	<xacro:macro name="link_viz_origin" params="xyz rpy">
+		<origin xyz="${xyz}" rpy = "${rpy}"/>
+	</xacro:macro>
+
+	<xacro:macro name="link_col_origin" params="xyz rpy">
+		<origin xyz="${xyz}" rpy = "${rpy}"/>
+	</xacro:macro>		
+
+	<xacro:macro name="link_viz_shape" params="*shape">
+		<xacro:insert_block name = "shape"/>
+	</xacro:macro>
+  
+	<xacro:macro name="link_col_shape" params="*shape">
+		<xacro:insert_block name = "shape"/>
+	</xacro:macro>
+
+	<xacro:macro name="link_color" params="rgba">
+		<color rgba="${rgba}"/>
+	</xacro:macro>
+
+	<xacro:macro name="link_center_of_mass" params="xyz">
+		<origin xyz="${xyz}"/>
+	</xacro:macro>
+
+	<xacro:macro name="link_inertia" params="ixx ixy ixz iyy iyz izz">
+		<inertia ixx="${ixx}" ixy="${ixy}" ixz="${ixz}" iyy="${iyy}" iyz="${iyz}" izz="${izz}" />
+	</xacro:macro>
+
+	<xacro:macro name = "base" params = "name mass empty color *link_viz_origin *link_col_origin *link_viz_shape *link_col_shape *link_color *link_center_of_mass *link_inertia">
+		<xacro:if value="${empty == 0}">
+			<link name="${name}_link">
+				<visual>
+					<xacro:insert_block name = "link_viz_origin"/>
+					<geometry>
+						<xacro:insert_block name = "link_viz_shape"/>
+					</geometry>
+					<xacro:if value="${color == 1}">
+						<material name="">
+							<xacro:insert_block name = "link_color"/>
+						</material>
+					</xacro:if>
+				</visual>
+				<collision>
+					<xacro:insert_block name = "link_col_origin"/>
+					<geometry>
+						<xacro:insert_block name = "link_col_shape"/>
+					</geometry>
+				</collision>
+				<inertial>
+					<xacro:insert_block name = "link_center_of_mass"/>
+					<mass value="${mass}"/>
+					<xacro:insert_block name = "link_inertia"/>
+				</inertial>
+			</link>
+		</xacro:if>
+		<xacro:if value="${empty == 1}">
+			<link name="${name}_link"/>
+		</xacro:if>
+
+	</xacro:macro>
+
+</robot>
