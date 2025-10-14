@@ -1,0 +1,7 @@
+/aruco_node:
+  ros__parameters:
+    marker_size: 0.1
+    aruco_dictionary_id: DICT_5X5_50
+    image_topic: /camera
+    camera_info_topic: /camera_info
+    camera_frame: box_1/link
