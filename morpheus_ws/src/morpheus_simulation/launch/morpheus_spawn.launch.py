@@ -56,6 +56,37 @@ def generate_launch_description():
     arguments = LaunchDescription([
                 DeclareLaunchArgument('world', default_value='marsyard2022', description='Gz sim World')])
 
+    # ------------------------------------------------------------------------------------------------------------
+    # ArUco Recognition Node:
+    # ------------------------------------------------------------------------------------------------------------
+    
+    # 获取 ArUco 配置文件路径 (保持不变)
+    aruco_params = os.path.join(
+        get_package_share_directory('ros2_aruco'),
+        'config',
+        'aruco_parameters.yaml'
+    )
+    
+    # 启动 ArUco 节点，并重载其参数以匹配主摄像头 (zed_2i)
+    aruco_node = Node(
+        package='ros2_aruco',
+        executable='aruco_node',
+        name='aruco_detector_2i',  # 明确节点名称
+        parameters=[aruco_params,
+                    # 重载参数，指向主摄像头话题
+                    {'image_topic': '/camera_2i'},
+                    {'camera_info_topic': '/camera_2i/camera_info'},
+                    # 建议设置 camera_frame 以确保 TF 变换正确
+                    {'camera_frame': 'zed_2i_link'} 
+                   ],
+        # 话题重映射：如果 /camera_2i 话题未发布 /image_raw 和 /camera_info
+        # 则需要在桥接处设置正确的命名规则，或者在这里进行重映射
+        remappings=[
+            # 由于 camera_info_topic 可能是 /camera_info，而 image_topic 是 /image_raw
+            # 这里的参数设置应该足够。但请注意 Gazebo 桥接的命名规范。
+        ]
+    )
+    
     # -------------------------------------------------------------------------------------------------------------
     # Robot Spawner:
     # -------------------------------------------------------------------------------------------------------------
@@ -188,7 +219,16 @@ def generate_launch_description():
         executable='parameter_bridge',
         arguments=['/camera_2i@sensor_msgs/msg/Image@gz.msgs.Image'], 
         output='screen'
-    ) 
+    )
+    
+    # 图像信息桥接 (需验证 Gazebo 输出的话题名)
+    # 假设 Gazebo 发布的话题是 /camera_2i/camera_info
+    bridge_camera_2i_info = Node( # <--- 修正 camera info bridge
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/camera_2i/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'], 
+        output='screen'
+    )  
 
     bridge_camera_mini = Node(
         package='ros_gz_bridge',
@@ -247,5 +287,6 @@ def generate_launch_description():
         bridge_scan,  # 启用 LIDAR 2D 扫描
         bridge_imu,  # 启用 IMU
         bridge_cloud, # 启用 LIDAR 点云
+        aruco_node,
         #rviz, # 稍后可通过 Nav2 的配置启动
     ])
