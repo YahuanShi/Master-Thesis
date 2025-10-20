@@ -1,195 +1,134 @@
-# ====================================================================================================
-# I. 全局配置和时钟同步
-# ====================================================================================================
-controller_server:
-  ros__parameters:
-    use_sim_time: True
-    controller_frequency: 20.0  # 局部控制器更新频率 (20-30 Hz 是合理范围)
-    min_x_velocity: 0.05
-    max_x_velocity: 1.0         # 最大前进速度 (m/s)，根据 Morpheus 的实际能力调整
-    max_theta_velocity: 1.0     # 最大旋转速度 (rad/s)
-    
-planner_server:
-  ros__parameters:
-    use_sim_time: True
-    expected_planner_frequency: 1.0
-    
-smoother_server:
-  ros__parameters:
-    use_sim_time: True
-    
-recovery_server:
-  ros__parameters:
-    use_sim_time: True
-    
-# SLAM 模式（如果使用 slam_toolbox）
-slam_toolbox:
-  ros__parameters:
-    use_sim_time: True
-    odom_frame: odom          # 必须与里程计坐标系一致
-    [cite_start]base_frame: chassis_link  # 机器人的基座坐标系 [cite: 31]
-    [cite_start]scan_topic: /scan         # 使用 LIDAR 2D 扫描数据 [cite: 32]
-    # ... (其他 SLAM 参数)
-    
-# AMCL 模式（如果使用预建地图）
 amcl:
   ros__parameters:
     use_sim_time: True
-    # 传感器话题必须与 Gazebo 桥接器的话题一致
-    [cite_start]scan_topic: /scan         # LIDAR 2D 扫描话题 [cite: 32]
-    initial_pose_x: 0.0
-    initial_pose_y: 4.0
-    [cite_start]initial_pose_a: 0.0       # 初始位姿与机器人出生位置 [cite: 32]
+    base_frame_id: chassis_link
+    odom_frame_id: odom
+    global_frame_id: map
+    scan_topic: /scan
+    min_particles: 500
+    max_particles: 2000
+    laser_model_type: likelihood_field
+    odom_alpha1: 0.2
+    odom_alpha2: 0.2
+    odom_alpha3: 0.2
+    odom_alpha4: 0.2
+    update_min_d: 0.1
+    update_min_a: 0.1
 
-# ====================================================================================================
-# II. 代价地图配置 (Costmap Configuration)
-# ====================================================================================================
-local_costmap:
-  local_costmap:
-    ros__parameters:
-      use_sim_time: True
-      global_frame: odom
-      [cite_start]robot_base_frame: chassis_link # 机器人的基座坐标系 [cite: 31]
-      update_frequency: 5.0
-      publish_frequency: 2.0
-      resolution: 0.05
-      [cite_start]footprint: "[[0.35, 0.21], [-0.35, 0.21], [-0.35, -0.21], [0.35, -0.21]]" # 基于 chassis_link (0.7x0.42m) 的估算足迹 [cite: 31]
-      plugins: ["obstacle_layer", "inflation_layer"]
-      
-      obstacle_layer:
-        plugin: "nav2_costmap_2d::ObstacleLayer"
-        parameters:
-          # [cite_start]必须使用 LIDAR 点云话题，因为它提供 3D 信息 [cite: 32]
-          observation_sources: "lidar_cloud" 
-          lidar_cloud:
-            topic: /scan/points
-            data_type: "sensor_msgs/PointCloud2"
-            clearing: True
-            marking: True
-            min_obstacle_height: 0.1 # 忽略地面上的低噪声
-            max_obstacle_height: 2.0
-            
-      inflation_layer:
-        plugin: "nav2_costmap_2d::InflationLayer"
-        parameters:
-          inflation_radius: 0.3 # 膨胀半径，给机器人留出安全空间
+bt_navigator:
+  ros__parameters:
+    use_sim_time: True
+    default_bt_xml_filename: "navigate_w_replanning_and_recovery.xml"
 
-global_costmap:
-  global_costmap:
-    ros__parameters:
-      use_sim_time: True
-      global_frame: map
-      [cite_start]robot_base_frame: chassis_link # 机器人的基座坐标系 [cite: 31]
-      update_frequency: 1.0
-      publish_frequency: 1.0
-      resolution: 0.05
-      footprint: "[[0.35, 0.21], [-0.35, 0.21], [-0.35, -0.21], [0.35, -0.21]]"
-      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
-      
-      obstacle_layer:
-        plugin: "nav2_costmap_2d::ObstacleLayer"
-        parameters:
-          observation_sources: "lidar_cloud"
-          lidar_cloud:
-            topic: /scan/points
-            data_type: "sensor_msgs/PointCloud2"
-            clearing: True
-            marking: True
-            min_obstacle_height: 0.1
-            max_obstacle_height: 2.0
-            
-      inflation_layer:
-        plugin: "nav2_costmap_2d::InflationLayer"
-        parameters:
-          inflation_radius: 0.3
-
-# ====================================================================================================
-# III. 局部规划器 (Local Controller - DWA)
-# ====================================================================================================
 controller_server:
   ros__parameters:
-    # 使用 DWA 作为局部控制器
-    plugins: ["dwb_controller"]
-    dwb_controller:
-      plugin: "dwb_core::DWBLocalPlanner"
-      
-      # 机器人运动学限制 (必须与 morpheus_control.py 保持一致)
-      ros__parameters:
-        min_speed_xy: 0.05
-        max_speed_xy: 1.0
-        max_vel_theta: 1.0
-        min_speed_theta: -1.0
-        max_speed_theta: 1.0
-        
-        # 假设最大加速度为 0.5 m/s^2 和 0.5 rad/s^2
-        accel_lim_x: 0.5 
-        accel_lim_y: 0.0 # Morpheus 不直接横向加速，由转向实现
-        accel_lim_theta: 0.5
-        
-        # 路径跟踪和目标设置
-        path_distance_bias: 32.0
-        goal_distance_bias: 24.0
-        occdist_scale: 0.02
-        
-        # 机器人的运动模型（Crucial! Morpheus 是 Differential Drive 的变种，但 DWA/Nav2 需要使用内置模型）
-        # 由于 Morpheus 具有复杂的四轮转向，标准的 Differential 或 Omnidirectional 模型可能不适用。
-        # 必须使用最接近的标准模型，通常是 Differential Drive，并在 morpheus_control.py 中处理运动学。
-        model_type: "differential" 
-        
-        # 速度和时间窗口
-        vx_samples: 20
-        vtheta_samples: 40
-        
-        # 速度指令话题，与 controller_server 中的 cmd_vel_topic 一致
-        cmd_vel_topic: "cmd_vel"
+    use_sim_time: True
+    controller_plugins: ["FollowPath"]
+    FollowPath:
+      plugin: "nav2_regulated_pure_pursuit_controller/RegulatedPurePursuitController"
+      desired_linear_vel: 0.6
+      lookahead_dist: 0.8
+      rotate_to_heading_angular_vel: 0.8
+      allow_reversing: false
+      use_velocity_scaled_lookahead_dist: true
+      transform_tolerance: 0.2
+    min_x_velocity_threshold: 0.01
 
-# ====================================================================================================
-# IV. 全局规划器 (Global Planner - NavFn)
-# ====================================================================================================
 planner_server:
   ros__parameters:
-    plugins: ["GridBased"]
+    use_sim_time: True
+    planner_plugins: ["GridBased"]
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"
-      ros__parameters:
-        use_astar: false
-        allow_unknown: true
-        tolerance: 0.5
+      tolerance: 0.1
+      use_astar: true
 
-# ====================================================================================================
-# V. 行为恢复 (Recovery)
-# ====================================================================================================
-recovery_server:
+behavior_server:
   ros__parameters:
-    plugins: ["spin", "backup"]
-    spin:
-      plugin: "nav2_recoveries/Spin"
-      ros__parameters:
-        angular_z: 1.0
-        max_attempts: 3
-    backup:
-      plugin: "nav2_recoveries/Backup"
-      ros__parameters:
-        speed: -0.1
-        distance: 0.15
-        max_attempts: 3
+    use_sim_time: True
 
-# ====================================================================================================
-# VI. 里程计融合 (Ekf/Imu/Odom)
-# 这一部分通常由 robot_localization 节点处理，Nav2 需要它的输出
-# Morpheus 项目中通常会独立启动 robot_localization/EKF 节点
-# ====================================================================================================
+smoother_server:
+  ros__parameters:
+    use_sim_time: True
 
-# robot_localization EKF 节点 (通常在单独的 launch 文件中配置和启动)
-# ekf_filter_node:
-#   ros__parameters:
-#     use_sim_time: True
-#     odom_frame: odom
-#     base_link_frame: chassis_link
-#     # input/output topics...
-#     # world_frame: odom
-#     # publish_tf: true
-#     # map_frame: map
-#     # sensor inputs:
-#     # imu0: {topic: /imu, ...}
-#     # odom0: {topic: /odom, ...}
+waypoint_follower:
+  ros__parameters:
+    use_sim_time: True
+
+global_costmap:
+  ros__parameters:
+    use_sim_time: True
+    global_frame: map
+    robot_base_frame: chassis_link
+    update_frequency: 1.0
+    publish_frequency: 1.0
+    resolution: 0.12   # 地图分辨率是0.012207，这里costmap可以取更粗一点，提速
+    rolling_window: false
+    width: 50.0
+    height: 50.0
+    robot_radius: 0.41   # ~ sqrt(0.35^2 + 0.21^2)
+    plugins: ["obstacle_layer", "inflation_layer", "static_layer"]
+    static_layer:
+      plugin: "nav2_costmap_2d::StaticLayer"
+      map_subscribe_transient_local: True
+    obstacle_layer:
+      plugin: "nav2_costmap_2d::ObstacleLayer"
+      observation_sources: scan
+      scan:
+        topic: /scan
+        max_obstacle_height: 2.0
+        clearing: True
+        marking: True
+        data_type: "LaserScan"
+        inf_is_valid: True
+    inflation_layer:
+      plugin: "nav2_costmap_2d::InflationLayer"
+      inflation_radius: 0.6
+      cost_scaling_factor: 3.0
+
+local_costmap:
+  ros__parameters:
+    use_sim_time: True
+    global_frame: odom
+    robot_base_frame: chassis_link
+    update_frequency: 10.0
+    publish_frequency: 5.0
+    rolling_window: true
+    width: 10.0
+    height: 10.0
+    resolution: 0.05
+    robot_radius: 0.41
+    plugins: ["obstacle_layer", "inflation_layer"]
+    obstacle_layer:
+      plugin: "nav2_costmap_2d::ObstacleLayer"
+      observation_sources: scan
+      scan:
+        topic: /scan
+        max_obstacle_height: 2.0
+        clearing: True
+        marking: True
+        data_type: "LaserScan"
+        inf_is_valid: True
+    inflation_layer:
+      plugin: "nav2_costmap_2d::InflationLayer"
+      inflation_radius: 0.5
+      cost_scaling_factor: 3.0
+
+map_server:
+  ros__parameters:
+    use_sim_time: True
+    yaml_filename: "$(find-pkg-share morpheus_nav2)/config/map.yaml"
+
+lifecycle_manager:
+  ros__parameters:
+    use_sim_time: True
+    autostart: True
+    node_names:
+      - map_server
+      - amcl
+      - controller_server
+      - planner_server
+      - behavior_server
+      - bt_navigator
+      - waypoint_follower
+      - smoother_server

@@ -1,0 +1,12 @@
+# morpheus_nav2/config/twist_mux.yaml
+# 两路输入：Nav2（次优先级）、手柄（高优先级）。可按需再加 safety 等。
+topics:
+  - name: nav2
+    topic: /cmd_vel_nav
+    timeout: 0.5      # 500ms 无消息则降级
+    priority: 50
+
+  - name: joy
+    topic: /cmd_vel_joy
+    timeout: 0.3      # 手动松开deadman会很快超时，回到nav2
+    priority: 100     # 手柄优先级更高：按住即接管
