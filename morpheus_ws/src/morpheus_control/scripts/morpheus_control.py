@@ -1,19 +1,22 @@
 #!/usr/bin/python3
 import math
-
 import threading
 
 from geometry_msgs.msg import Twist
-
 import numpy as np
 
 import rclpy
 from rclpy.node import Node
+from rclpy.duration import Duration  # [3A] for timeout
 from sensor_msgs.msg import Joy
-from std_msgs.msg import Float64MultiArray 
+from std_msgs.msg import Float64MultiArray
 
-vel_msg = Twist()  # robot velosity
-mode_selection = 4  # 1:opposite phase, 2:in-phase, 3:pivot turn 4: none
+# ----------------- 全局共享（为保持你原始结构的最小改动） -----------------
+vel_msg_joy = Twist()   # 手柄速度
+vel_msg_nav = Twist()   # Nav2 速度
+mode_selection = 4      # 1:opposite phase, 2:in-phase, 3:pivot turn 4: none (drive)
+auto_mode = False       # [3A] False=手柄优先, True=Nav2优先
+last_nav_stamp_ns = 0   # [3A] 记录最近一次收到 /cmd_vel_nav 的时刻 (nanoseconds)
 
 class Robot_control(Node):
 
