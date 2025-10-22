@@ -188,6 +188,15 @@ def generate_launch_description():
             ],
         )
     )
+    
+    static_base_alias = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='baselink_alias',
+        # x y z qx qy qz qw parent child
+        arguments=['0', '0', '0', '0', '0', '0', '1', 'chassis_link', 'base_link'],
+        output='screen'
+    )
 
     # ----------------------------
     # Nav2 Bringup
@@ -240,6 +249,24 @@ def generate_launch_description():
     #     arguments=['/camera_mini@sensor_msgs/msg/Image@gz.msgs.Image'], 
     #     output='screen'
     # ) 
+    
+    # Gazebo 模型里程计 —— 把 gz 的 odometry 桥成 ROS 的 /odom
+    bridge_odom = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/world/marsyard2022/model/morpheus_rover/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry'],
+        output='screen',
+    )
+    
+    ekf_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_odom',
+        output='screen',
+        parameters=[os.path.join(morpheus_simulation_path, 'config', 'ekf_odom.yaml'),
+                    {'use_sim_time': use_sim_time}],
+    )
+
 
     # IMU
     bridge_imu = Node(
@@ -271,6 +298,7 @@ def generate_launch_description():
             arguments,
             gazebo,
             node_robot_state_publisher,
+            static_base_alias,
             gz_spawn_entity,
             activate_joint_state_controller,
             activate_controllers,
@@ -279,6 +307,8 @@ def generate_launch_description():
             bridge_camera_2i,
             bridge_camera_2i_info,
             bridge_scan,
+            bridge_odom,
+            ekf_node,
             bridge_imu,
             bridge_cloud,
             aruco_node,
