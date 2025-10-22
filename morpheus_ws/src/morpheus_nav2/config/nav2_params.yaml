@@ -14,25 +14,47 @@ amcl:
     odom_alpha4: 0.2
     update_min_d: 0.1
     update_min_a: 0.1
+    transform_tolerance: 0.2
 
 bt_navigator:
   ros__parameters:
     use_sim_time: True
-    default_bt_xml_filename: "navigate_w_replanning_and_recovery.xml"
+    # 建议在 launch 里传 default_bt_xml_filename 的绝对路径，这里留空用默认树
 
 controller_server:
   ros__parameters:
     use_sim_time: True
     controller_plugins: ["FollowPath"]
+
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller/RegulatedPurePursuitController"
-      desired_linear_vel: 0.6
-      lookahead_dist: 0.8
-      rotate_to_heading_angular_vel: 0.8
-      allow_reversing: false
+      # —— 常用/稳妥参数（可跑通；后续再微调）——
+      desired_linear_vel: 0.6            # 最大线速度
+      max_angular_accel: 2.0             # 角加速度限幅，避免旋转过猛
+      lookahead_dist: 0.8                # 基础前瞻距离
+      min_lookahead_dist: 0.3
+      max_lookahead_dist: 1.5
+      lookahead_time: 1.5
       use_velocity_scaled_lookahead_dist: true
+      rotate_to_heading: true            # 允许在起步前对准航向
+      rotate_to_heading_angular_vel: 0.8
+      allow_reversing: false             # 非差速倒车，先关
       transform_tolerance: 0.2
+      use_interpolation: true
+
+      # 避障相关（RPPC特有）
+      use_cost_regulated_linear_velocity_scaling: true
+      cost_scaling_dist: 0.6
+      cost_scaling_gain: 1.0
+
+      # 曲率限幅，防止尖锐转向导致打角过大
+      curvature_lookahead_dist: 0.8
+      min_curvature: 0.0
+      max_curvature: 1.0
+
+    # 小速度阈值，防止微抖
     min_x_velocity_threshold: 0.01
+
 
 planner_server:
   ros__parameters:
@@ -50,6 +72,13 @@ behavior_server:
 smoother_server:
   ros__parameters:
     use_sim_time: True
+    smoother_plugins: ["simple_smoother"]
+    simple_smoother:
+      plugin: "nav2_smoother::SimpleSmoother"
+      tolerance: 1.0e-10
+      w_eucl_dist: 1.0
+      w_curvature: 1.0
+      w_smoothness: 1.0
 
 waypoint_follower:
   ros__parameters:
@@ -62,12 +91,13 @@ global_costmap:
     robot_base_frame: chassis_link
     update_frequency: 1.0
     publish_frequency: 1.0
-    resolution: 0.12   # 地图分辨率是0.012207，这里costmap可以取更粗一点，提速
+    resolution: 0.12          # 原图 0.012207，可略粗以提速
     rolling_window: false
     width: 50.0
     height: 50.0
-    robot_radius: 0.41   # ~ sqrt(0.35^2 + 0.21^2)
-    plugins: ["obstacle_layer", "inflation_layer", "static_layer"]
+    robot_radius: 0.41
+    footprint: ""
+    plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
     static_layer:
       plugin: "nav2_costmap_2d::StaticLayer"
       map_subscribe_transient_local: True
@@ -98,6 +128,7 @@ local_costmap:
     height: 10.0
     resolution: 0.05
     robot_radius: 0.41
+    footprint: ""
     plugins: ["obstacle_layer", "inflation_layer"]
     obstacle_layer:
       plugin: "nav2_costmap_2d::ObstacleLayer"
@@ -117,7 +148,7 @@ local_costmap:
 map_server:
   ros__parameters:
     use_sim_time: True
-    yaml_filename: "$(find-pkg-share morpheus_nav2)/config/map.yaml"
+    # yaml_filename 由 bringup_nav2.launch.py 注入；此处留空更稳
 
 lifecycle_manager:
   ros__parameters:
