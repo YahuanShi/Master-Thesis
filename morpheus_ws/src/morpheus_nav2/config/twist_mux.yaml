@@ -1,22 +1,23 @@
 twist_mux:
   ros__parameters:
     use_sim_time: true
+
     topics:
-      - name: cmd_nav
+      cmd_nav:               # <- 任意键名即可，用来标识来源
         topic: /cmd_vel_nav
         timeout: 0.5
         priority: 50
         short_desc: "Nav2 输出"
 
-      - name: cmd_joy
+      cmd_joy:
         topic: /cmd_vel_joy
         timeout: 0.5
         priority: 100
         short_desc: "手柄 teleop_twist_joy 输出"
 
     locks:
-      - name: e_stop
+      e_stop:
         topic: /emergency_stop
-        timeout: 0.0
+        timeout: 0.0         # 0 表示“非空即锁”
         priority: 255
         short_desc: "急停锁，非空触发"
