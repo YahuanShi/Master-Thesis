@@ -278,12 +278,21 @@ if __name__ == '__main__':
     executor_thread = threading.Thread(target=executor.spin, daemon=True)
     executor_thread.start()
 
+    # try:
+    #     # rclpy 没有 create_rate on Node（此前那行会抛错），用 sleep 循环就行
+    #     while rclpy.ok():
+    #         rclpy.spin_once(robot_control, timeout_sec=0.1)
+    # except KeyboardInterrupt:
+    #     pass
     try:
-        # rclpy 没有 create_rate on Node（此前那行会抛错），用 sleep 循环就行
-        while rclpy.ok():
-            rclpy.spin_once(robot_control, timeout_sec=0.1)
+       executor_thread.join()
     except KeyboardInterrupt:
         pass
+    finally:
+        try:
+            rclpy.shutdown()
+        except Exception:
+            pass
 
     rclpy.shutdown()
     executor_thread.join()

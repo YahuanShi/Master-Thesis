@@ -51,6 +51,7 @@ def generate_launch_description():
                     '.sdf',
                     ' -v 1',
                     ' -r',
+                    ' -s'
                 ],
             )
         ],
@@ -247,16 +248,6 @@ def generate_launch_description():
         arguments=['/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
         output='screen',
     )
-    
-    # Twist mux
-    twist_mux = Node(
-        package='twist_mux',
-        executable='twist_mux',
-        name='twist_mux',
-        output='screen',
-        parameters=[os.path.join(morpheus_nav2_path, 'config', 'twist_mux.yaml'),{use_sim_time: use_sim_time}],
-        remappings=[('/cmd_vel_out', '/cmd_vel')]
-    )
 
     # ----------------------------
     # RViz (optional)
@@ -291,7 +282,6 @@ def generate_launch_description():
             bridge_imu,
             bridge_cloud,
             aruco_node,
-            twist_mux
             # bridge_camera_mini, # 机械臂摄像头，非导航核心，可选启用
             # bridge_camera_info,,
             # rviz,  # 可按需启用
