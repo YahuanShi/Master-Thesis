@@ -16,6 +16,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
+gui = LaunchConfiguration('gui', default='true')
 
 def generate_launch_description():
 
@@ -46,18 +47,10 @@ def generate_launch_description():
     gz_pkg_path = os.path.join(get_package_share_directory('ros_gz_sim'), 'launch')
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([gz_pkg_path, '/gz_sim.launch.py']),
-        launch_arguments=[
-            (
-                'gz_args',
-                [
-                    LaunchConfiguration('world'),
-                    '.sdf',
-                    ' -v 1',
-                    ' -r',
-                    ' -s'
-                ],
-            )
-        ],
+        launch_arguments={
+            'gz_args': [LaunchConfiguration('world'), '.sdf', ' -v 1', ' -r'],
+            'gui': gui
+        }.items(),
     )
 
     arguments = LaunchDescription(
