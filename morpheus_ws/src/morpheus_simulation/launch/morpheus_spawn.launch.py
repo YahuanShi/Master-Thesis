@@ -133,11 +133,10 @@ def generate_launch_description():
         ),
     )
     
-    # load_ackermann_controller = ExecuteProcess(
-    #     cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-    #          'test_ackermann_steering_controller'],
-    #     output='screen'
-    # )
+    load_ackermann_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 'test_ackermann_steering_controller'],
+        output='screen'
+    )
 
     load_joint_state_controller = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 'joint_state_broadcaster'],
@@ -242,13 +241,13 @@ def generate_launch_description():
         arguments=['/camera_2i/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'],
         output='screen',
     )
-    # # Mini camera (Robotic arm)
-    # bridge_camera_mini = Node(
-    #     package='ros_gz_bridge',
-    #     executable='parameter_bridge',
-    #     arguments=['/camera_mini@sensor_msgs/msg/Image@gz.msgs.Image'], 
-    #     output='screen'
-    # ) 
+    # Mini camera (Robotic arm)
+    bridge_camera_mini = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/camera_mini@sensor_msgs/msg/Image@gz.msgs.Image'], 
+        output='screen'
+    ) 
     
     # Gazebo 模型里程计 —— 把 gz 的 odometry 桥成 ROS 的 /odom
     bridge_odom = Node(
@@ -261,9 +260,9 @@ def generate_launch_description():
     ekf_node = Node(
         package='robot_localization',
         executable='ekf_node',
-        name='ekf_odom',
+        name='ekf',
         output='screen',
-        parameters=[os.path.join(morpheus_simulation_path, 'config', 'ekf_odom.yaml'),
+        parameters=[os.path.join(morpheus_nav2_path, 'config', 'ekf.yaml'),
                     {'use_sim_time': use_sim_time}],
     )
 
@@ -311,7 +310,7 @@ def generate_launch_description():
             ekf_node,
             bridge_imu,
             bridge_cloud,
-            aruco_node,
+            # aruco_node,
             # bridge_camera_mini, # 机械臂摄像头，非导航核心，可选启用
             # bridge_camera_info,,
             # rviz,  # 可按需启用

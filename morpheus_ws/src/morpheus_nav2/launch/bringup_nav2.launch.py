@@ -158,7 +158,7 @@ def generate_launch_description():
     )
 
     # ---------------------------
-    # teleop_twist_joy + twist_mux（可选）
+    # teleop_twist_joy + twist_mux
     # ---------------------------
 
     joy_node = Node(
@@ -192,7 +192,6 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        # 声明参数
         declare_use_sim_time,
         declare_params_file,
         declare_map_yaml,
@@ -214,7 +213,7 @@ def generate_launch_description():
         # waypoint_follower,
         lifecycle_mgr,
 
-        # teleop + mux（可选）
+        # teleop + mux
         joy_node,
         teleop,
         twist_mux,
