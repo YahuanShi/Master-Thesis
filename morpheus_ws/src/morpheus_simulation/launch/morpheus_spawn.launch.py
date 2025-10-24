@@ -254,7 +254,7 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Mini camera (Robotic arm) - 可选
+    # Mini camera (Robotic arm)
     bridge_camera_mini = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -262,7 +262,7 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Gazebo 模型里程计 —— 把 gz 的 odometry 桥成 ROS 的 /world/.../odometry
+    # Gazebo odometry
     bridge_odom = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -336,7 +336,9 @@ def generate_launch_description():
         bridge_cloud,
 
         # 可选
+        # aruco_node,
         # bridge_camera_mini,
+        # bridge_camera_info,
         # rviz,
     ]
 
