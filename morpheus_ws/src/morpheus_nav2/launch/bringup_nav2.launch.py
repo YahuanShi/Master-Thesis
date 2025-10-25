@@ -43,7 +43,7 @@ def generate_launch_description():
     )
     declare_cmd_vel_topic = DeclareLaunchArgument(
         'cmd_vel_topic', default_value=cmd_vel_topic,
-        description='Where controller_server publishes cmd_vel (feed into twist_mux)'
+        description='Where controller_server/behavior_server publish cmd_vel (feeds twist_mux)'
     )
 
     declare_with_teleop = DeclareLaunchArgument(
@@ -67,7 +67,6 @@ def generate_launch_description():
     # Nav2 Nodes
     # ---------------------------
 
-    # map_server 既读 params_file，也接受显式 map.yaml 覆盖（更稳）
     map_server = Node(
         package='nav2_map_server',
         executable='map_server',
@@ -93,7 +92,7 @@ def generate_launch_description():
         parameters=[params_file, {'use_sim_time': use_sim_time}]
     )
 
-    # 关键：把 /cmd_vel 重映射到 /cmd_vel_nav，以便与 twist_mux 对接
+    # 关键①：把 controller_server 的 /cmd_vel 重映射到 /cmd_vel_nav
     controller = Node(
         package='nav2_controller',
         executable='controller_server',
@@ -111,12 +110,15 @@ def generate_launch_description():
         parameters=[params_file, {'use_sim_time': use_sim_time}]
     )
 
+    # 关键②：behavior_server 也会发布 /cmd_vel（多个插件各占一个 publisher）
+    # 同样重映射到 /cmd_vel_nav，杜绝直接写 /cmd_vel
     behavior = Node(
         package='nav2_behaviors',
         executable='behavior_server',
         name='behavior_server',
         output='screen',
-        parameters=[params_file, {'use_sim_time': use_sim_time}]
+        parameters=[params_file, {'use_sim_time': use_sim_time}],
+        remappings=[('/cmd_vel', cmd_vel_topic)]
     )
 
     bt_nav = Node(
@@ -126,15 +128,6 @@ def generate_launch_description():
         output='screen',
         parameters=[params_file, {'use_sim_time': use_sim_time}]
     )
-
-    # 可选：若用 waypoint_follower，可在 nav2_params.yaml 配置后放开
-    # waypoint_follower = Node(
-    #     package='nav2_waypoint_follower',
-    #     executable='waypoint_follower',
-    #     name='waypoint_follower',
-    #     output='screen',
-    #     parameters=[params_file, {'use_sim_time': use_sim_time}]
-    # )
 
     lifecycle_mgr = Node(
         package='nav2_lifecycle_manager',
@@ -152,7 +145,6 @@ def generate_launch_description():
                 'smoother_server',
                 'behavior_server',
                 'bt_navigator'
-                # 'waypoint_follower'  # 如启用则加入
             ]
         }]
     )
@@ -175,7 +167,6 @@ def generate_launch_description():
         name='teleop_twist_joy',
         output='screen',
         parameters=[teleop_cfg, {'use_sim_time': use_sim_time}],
-        # 双保险：即使 YAML 里已设置 cmd_vel_topic，这里也统一改名
         remappings=[('/cmd_vel', '/cmd_vel_joy')],
         condition=IfCondition(with_teleop)
     )
@@ -210,7 +201,6 @@ def generate_launch_description():
         smoother,
         behavior,
         bt_nav,
-        # waypoint_follower,
         lifecycle_mgr,
 
         # teleop + mux

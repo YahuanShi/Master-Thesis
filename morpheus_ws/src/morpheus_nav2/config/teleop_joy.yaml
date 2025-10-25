@@ -9,7 +9,7 @@ teleop_twist_joy:
     axis_linear:
       x: 1
     axis_angular:
-      yaw: 1
+      yaw: 3
 
     # 比例（同样是分轴的结构）
     scale_linear:
