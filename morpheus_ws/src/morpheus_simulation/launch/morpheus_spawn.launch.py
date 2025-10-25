@@ -291,7 +291,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(morpheus_nav2_path, 'launch', 'bringup_nav2.launch.py')
         ),
-        launch_arguments={'use_sim_time': 'true'}.items(),
+        launch_arguments={'use_sim_time': 'true', 'with_teleop': 'true'}.items(),
     )
     activate_nav2 = TimerAction(period=2.0, actions=[nav2_bringup_launch ])
 
