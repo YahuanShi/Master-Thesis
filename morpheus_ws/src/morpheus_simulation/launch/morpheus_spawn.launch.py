@@ -53,9 +53,11 @@ def generate_launch_description():
         }.items(),
     )
 
-    arguments = LaunchDescription(
-        [DeclareLaunchArgument('world', default_value='marsyard2022', description='GZ Sim world')]
-    )
+    arguments = LaunchDescription([
+        DeclareLaunchArgument('world', default_value='marsyard2022', description='GZ Sim world'),
+        DeclareLaunchArgument('gui', default_value='true', description='Start Gazebo GUI'),
+        DeclareLaunchArgument('use_sim_time', default_value='true', description='Use Gazebo clock')
+    ])
 
     # ----------------------------
     # (Optional) ArUco recognition (uses zed_2i)
@@ -118,6 +120,15 @@ def generate_launch_description():
             '-Y', '0.0',
         ],
     )
+    
+    # base_link 别名（如外部包用 base_link）
+    static_base_alias = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='baselink_alias',
+        arguments=['0', '0', '0', '0', '0', '0', '1', 'chassis_link', 'base_link'],
+        output='screen'
+    )
 
     # ----------------------------
     # Controllers via spawner
@@ -131,13 +142,13 @@ def generate_launch_description():
 
     CONTROLLER_MGR = '/controller_manager'  # gz_ros2_control 默认名
     
-    spawner_ackermann = Node(
-        package='controller_manager',
-        executable='spawner',
-        name='spawner_ackermann_controller',
-        arguments=['ackermann_controller', '--controller-manager', CONTROLLER_MGR],
-        output='screen'
-    )
+    # spawner_ackermann = Node(
+    #     package='controller_manager',
+    #     executable='spawner',
+    #     name='spawner_ackermann_controller',
+    #     arguments=['ackermann_controller', '--controller-manager', CONTROLLER_MGR],
+    #     output='screen'
+    # )
 
     spawner_jsb = Node(
         package='controller_manager',
@@ -203,16 +214,6 @@ def generate_launch_description():
     )
 
     # ----------------------------
-    # Nav2 Bringup
-    # ----------------------------
-    activate_nav2 = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(morpheus_nav2_path, 'launch', 'bringup_nav2.launch.py')
-        ),
-        launch_arguments={'use_sim_time': 'true'}.items(),
-    )
-
-    # ----------------------------
     # ROS ⇄ Gazebo bridges
     # ----------------------------
     # Lidar scan
@@ -263,7 +264,17 @@ def generate_launch_description():
         output='screen',
     )
 
+    # IMU
+    bridge_imu = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
+        output='screen',
+    )
+    
+    # ----------------------------
     # EKF（发布 odom->base_link）
+    # ----------------------------
     ekf_node = Node(
         package='robot_localization',
         executable='ekf_node',
@@ -272,14 +283,17 @@ def generate_launch_description():
         parameters=[os.path.join(morpheus_nav2_path, 'config', 'ekf.yaml'),
                     {'use_sim_time': use_sim_time}],
     )
-
-    # IMU
-    bridge_imu = Node(
-        package='ros_gz_bridge',
-        executable='parameter_bridge',
-        arguments=['/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
-        output='screen',
+    
+    # ----------------------------
+    # Nav2 Bringup
+    # ----------------------------
+    nav2_bringup_launch  = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(morpheus_nav2_path, 'launch', 'bringup_nav2.launch.py')
+        ),
+        launch_arguments={'use_sim_time': 'true'}.items(),
     )
+    activate_nav2 = TimerAction(period=2.0, actions=[nav2_bringup_launch ])
 
     # ----------------------------
     # RViz (optional)
@@ -301,15 +315,9 @@ def generate_launch_description():
         gazebo_resource_path,
         arguments,
         gazebo,
+        
         node_robot_state_publisher,
-        # base_link 别名（需要的话）
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            name='baselink_alias',
-            arguments=['0', '0', '0', '0', '0', '0', '1', 'chassis_link', 'base_link'],
-            output='screen'
-        ),
+        static_base_alias,
         gz_spawn_entity,
 
         # 控制器：事件式顺序
@@ -317,16 +325,17 @@ def generate_launch_description():
         activate_rest_after_jsb,
 
         controller,          # 注意避免在这个 include 内部重复加载控制器
-        activate_nav2,
 
         # Bridges & sensors
         bridge_camera_2i,
         bridge_camera_2i_info,
         bridge_scan,
         bridge_odom,
-        ekf_node,
         bridge_imu,
         bridge_cloud,
+        
+        ekf_node,
+        activate_nav2,
 
         # 可选
         # aruco_node,
@@ -337,5 +346,7 @@ def generate_launch_description():
 
     if aruco_node is not None:
         ld_items.append(aruco_node)
+        # ld_items.append(bridge_camera_mini)   # 如需 Mini camera 桥接也取消注释
+        # ld_items.append(rviz)          # 如需 RViz 也取消注释
 
     return LaunchDescription(ld_items)
