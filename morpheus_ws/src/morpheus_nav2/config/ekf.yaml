@@ -1,7 +1,7 @@
 ekf:
   ros__parameters:
     #################################################################
-    # 基本设置
+    # Basic Settings
     #################################################################
     frequency: 50.0
     two_d_mode: true
@@ -11,7 +11,7 @@ ekf:
     # debug_out_file: /tmp/ekf_debug.txt
 
     #################################################################
-    # 坐标系
+    # Coordinate Frames
     #################################################################
     map_frame: map
     odom_frame: odom
@@ -19,13 +19,13 @@ ekf:
     world_frame: odom   # Nav2 期望 odom 为“世界系（局部漂移）”
 
     #################################################################
-    # 传感器 1：Gazebo 里程计（nav_msgs/Odometry）
-    # 话题来自桥接：
+    # # Sensor 1: Gazebo Odometry (nav_msgs/Odometry)
+    # Topic comes from the bridge:
     #   /world/marsyard2022/model/morpheus_rover/odometry
-    # 取用 x, y, yaw 与 vx, vy, yaw_rate
+    # Use x, y, yaw and vx, vy, yaw_rate
     #################################################################
     odom0: /world/marsyard2022/model/morpheus_rover/odometry
-    odom0_config: [true,  true,  false,   # x, y, z (只用平面)
+    odom0_config: [true,  true,  false,   # x, y, z (use only planar motion)
                    false, false, true,    # roll, pitch, yaw
                    true,  true,  false,   # vx, vy, vz
                    false, false, true,    # vroll, vpitch, vyaw
@@ -35,21 +35,21 @@ ekf:
     # odom0_queue_size: 10
 
     #################################################################
-    # 传感器 2：IMU（sensor_msgs/Imu）
-    # 只用 yaw、yaw rate、线加速度（EKF 积分）
+    # Sensor 2: IMU (sensor_msgs/Imu)
+    # Use only yaw, yaw rate, and linear acceleration (for EKF integration)
     #################################################################
     imu0: /imu
-    imu0_config: [false, false, false,   # 位置 x y z
-                  false, false, true,    # 姿态 roll pitch yaw（只用 yaw）
-                  false, false, false,   # 线速度
-                  false, false, true,    # 角速度（只用 yaw rate）
-                  true,  true,  true]    # 线加速度 ax ay az
+    imu0_config: [false, false, false,   # position x y z
+                  false, false, true,    # orientation roll pitch yaw（只用 yaw）
+                  false, false, false,   # velocity
+                  false, false, true,    # angular velocity (use only yaw rate)
+                  true,  true,  true]    # acceleration ax ay az
     imu0_differential: false
     imu0_remove_gravitational_acceleration: true
     # imu0_queue_size: 50
 
     #################################################################
-    # 其他常用参数（按需微调）
+    # Other Common Parameters (tune as needed)
     #################################################################
     sensor_timeout: 0.1
     # transform_time_offset: 0.0
