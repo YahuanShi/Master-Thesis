@@ -273,7 +273,7 @@ def generate_launch_description():
     )
     
     # ----------------------------
-    # EKF（发布 odom->base_link）
+    # EKF（publish odom->base_link）
     # ----------------------------
     ekf_node = Node(
         package='robot_localization',

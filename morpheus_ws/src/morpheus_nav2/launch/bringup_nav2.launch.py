@@ -19,7 +19,7 @@ def generate_launch_description():
     # 让 Nav2 的速度输出到 /cmd_vel_nav，供 twist_mux 仲裁
     cmd_vel_topic  = LaunchConfiguration('cmd_vel_topic',  default='/cmd_vel_nav')
 
-    # teleop_twist_joy + twist_mux（可选）
+    # teleop_twist_joy + twist_mux（optional）
     with_teleop    = LaunchConfiguration('with_teleop',    default='true')
     with_joy       = LaunchConfiguration('with_joy',       default='false')  # 若你的 joy_node 在别处已启动，保持 false
     teleop_cfg     = LaunchConfiguration('teleop_cfg',     default=os.path.join(pkg, 'config', 'teleop_joy.yaml'))
