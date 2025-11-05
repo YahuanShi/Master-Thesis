@@ -4,7 +4,7 @@
   <version>0.0.1</version>
   <description>Nav2 bringup for Morpheus rover (Gazebo)</description>
 
-  <maintainer email="you@example.com">you</maintainer>
+  <maintainer email="yahuan.git@gmail.com">YahuanShi</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

@@ -26,7 +26,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='syh',
-    maintainer_email='you@example.com',
+    maintainer_email='yahuan.git@gmail.com',
     description='Nav2 integration for Morpheus (bringup, map, teleop & twist_mux configs).',
     license='BSD-3-Clause',
     tests_require=['pytest'],
