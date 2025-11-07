@@ -291,7 +291,7 @@ class RobotDescriptionFunctions:
         response = QFileDialog.getOpenFileName(
             parent=self.ui,
             caption='Select a mesh file',
-            directory='/home/oscar/Dokumente/Masterarbeit/morpheus_ws/src/morpheus_description/urdf/01_robot_description/meshes', # TODO: Generic
+            directory=os.path.join(self.package_path, 'urdf', '01_robot_description', 'meshes'),
             filter=file_filer,
             initialFilter='DAE File (*.dae *.DAE)'
         )
@@ -304,7 +304,7 @@ class RobotDescriptionFunctions:
         response = QFileDialog.getOpenFileName(
             parent=self.ui,
             caption='Select a mesh file',
-            directory='/home/oscar/Dokumente/Masterarbeit/morpheus_ws/src/morpheus_description/urdf/01_robot_description/meshes', # TODO: Generic
+            directory=os.path.join(self.package_path, 'urdf', '01_robot_description', 'meshes'),
             filter=file_filer,
             initialFilter='STL File (*.stl *.STL)'
         )

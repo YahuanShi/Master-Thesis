@@ -1,3 +1,5 @@
+import os
+
 from PyQt6.QtWidgets import QFileDialog
 
 class URDFImporterFunctions:
@@ -9,7 +11,7 @@ class URDFImporterFunctions:
         response = QFileDialog.getOpenFileName(
             parent=self.ui,
             caption='Select an URDF file',
-            directory='/home/oscar/Dokumente/Masterarbeit/morpheus_ws', # TODO: Generic
+            directory=os.path.expanduser('~'),
             filter=file_filter,
             initialFilter=file_filter
         )
@@ -19,9 +21,9 @@ class URDFImporterFunctions:
         directory = QFileDialog.getExistingDirectory(
             self.ui,
             caption='Select the package where the urdf is located',
-            directory= '/home/oscar/Dokumente/Masterarbeit/morpheus_ws'
-        )        
-        return directory  
+            directory=os.path.expanduser('~')
+        )
+        return directory
     
     def get_urdf_link_names(self, root):
 

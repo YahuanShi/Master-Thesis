@@ -89,7 +89,7 @@ class ROS2Tools:
 
     def start_rviz(self):
 
-        config_file = '/home/oscar/Dokumente/Masterarbeit/morpheus_ws/src/morpheus_description/user_interface/default.rviz' # TODO: generic
+        config_file = os.path.join(self.package_path, 'user_interface', 'default.rviz')
         cmd_rviz = ['ros2', 'run', 'rviz2', 'rviz2', '-d', config_file]
         self.process_rviz = subprocess.Popen(
             cmd_rviz,

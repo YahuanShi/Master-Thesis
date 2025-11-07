@@ -142,7 +142,7 @@ class URDFImporter:
             stderr=subprocess.PIPE,
             preexec_fn=os.setsid
         )
-        config_file = '/home/oscar/Dokumente/Masterarbeit/morpheus_ws/src/morpheus_description/user_interface/config/urdf_import.rviz' # TODO: generic
+        config_file = os.path.join(self.package_path, 'user_interface', 'config', 'urdf_import.rviz')
         cmd_rviz_import = ['ros2', 'run', 'rviz2', 'rviz2', '-d', config_file, '--ros-args', '-r', '__node:=rviz_import']
         self.process_rviz_import = subprocess.Popen(
             cmd_rviz_import,
