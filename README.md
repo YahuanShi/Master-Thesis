@@ -33,6 +33,36 @@ Morpheus/
 
 ## Getting Started
 
+The simulation stack (Gazebo, Nav2, `ros2_control`, sensor fusion, …) has a long
+and version-sensitive dependency chain, so the recommended way to build and run
+it is inside the provided Docker container — this keeps the setup reproducible
+and isolated from other projects on the host.
+
+### Option A: Docker (recommended)
+
+Requires Docker and, for GPU-accelerated rendering, the NVIDIA Container
+Toolkit.
+
+```bash
+./docker/run.sh
+```
+
+This builds an image with all required ROS 2 Humble packages (Gazebo/`ros_gz`,
+Nav2, `ros2_control`, `robot_localization`, `twist_mux`, …), then drops you into
+a shell with the project mounted at `/workspace/Morpheus`, GPU + X11 + joystick
+passthrough enabled. From there:
+
+```bash
+cd morpheus_ws
+colcon build
+source install/setup.bash
+./run_morpheus_all.sh
+```
+
+### Option B: Native install
+
+If you'd rather install everything directly on the host:
+
 ```bash
 # Build the workspace
 cd morpheus_ws
