@@ -141,14 +141,6 @@ def generate_launch_description():
     )
 
     CONTROLLER_MGR = '/controller_manager'  # gz_ros2_control 默认名
-    
-    # spawner_ackermann = Node(
-    #     package='controller_manager',
-    #     executable='spawner',
-    #     name='spawner_ackermann_controller',
-    #     arguments=['ackermann_controller', '--controller-manager', CONTROLLER_MGR],
-    #     output='screen'
-    # )
 
     spawner_jsb = Node(
         package='controller_manager',
@@ -190,14 +182,6 @@ def generate_launch_description():
         output='screen'
     )
     
-    # spawner_gripper = Node(
-    #     package='controller_manager',
-    #     executable='spawner',
-    #     name='spawner_gripper_controller',
-    #     arguments=['gripper_controller', '--controller-manager', CONTROLLER_MGR],
-    #     output='screen'
-    # )
-
     # 顺序：spawn 完成 → 1s 后 JSB → JSB 成功后并行加载其它
     activate_jsb_after_spawn = RegisterEventHandler(
         event_handler=OnProcessExit(
@@ -216,10 +200,22 @@ def generate_launch_description():
     # ----------------------------
     # ROS ⇄ Gazebo bridges
     # ----------------------------
+    # Sim clock — required by every node running with use_sim_time=true
+    # (controllers, Nav2, EKF, robot_state_publisher, …); without this bridge
+    # /clock has no publisher and all of their timers/TF stay frozen.
+    bridge_clock = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='bridge_clock',
+        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        output='screen',
+    )
+
     # Lidar scan
     bridge_scan = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
+        name='bridge_scan',
         arguments=['/scan@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan'],
         output='screen',
     )
@@ -228,6 +224,7 @@ def generate_launch_description():
     bridge_cloud = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
+        name='bridge_cloud',
         arguments=['/scan/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked'],
         output='screen',
     )
@@ -236,6 +233,7 @@ def generate_launch_description():
     bridge_camera_2i = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
+        name='bridge_camera_2i',
         arguments=['/camera_2i@sensor_msgs/msg/Image@gz.msgs.Image'],
         output='screen',
     )
@@ -244,6 +242,7 @@ def generate_launch_description():
     bridge_camera_2i_info = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
+        name='bridge_camera_2i_info',
         arguments=['/camera_2i/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'],
         output='screen',
     )
@@ -252,6 +251,7 @@ def generate_launch_description():
     bridge_camera_mini = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
+        name='bridge_camera_mini',
         arguments=['/camera_mini@sensor_msgs/msg/Image@gz.msgs.Image'],
         output='screen'
     )
@@ -260,6 +260,7 @@ def generate_launch_description():
     bridge_odom = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
+        name='bridge_odom',
         arguments=['/world/marsyard2022/model/morpheus_rover/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry'],
         output='screen',
     )
@@ -268,6 +269,7 @@ def generate_launch_description():
     bridge_imu = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
+        name='bridge_imu',
         arguments=['/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
         output='screen',
     )
@@ -327,6 +329,7 @@ def generate_launch_description():
         controller,          # 注意避免在这个 include 内部重复加载控制器
 
         # Bridges & sensors
+        bridge_clock,
         bridge_camera_2i,
         bridge_camera_2i_info,
         bridge_scan,

@@ -40,10 +40,13 @@ def generate_launch_description():
         ),
 
         # -------- Morpheus control (reads /cmd_vel for base, /joy for arm) --------
+        # No `name=` override here: the script creates two distinctly-named
+        # rclpy nodes (`robot_control`, `joy_subscriber`); a launch-level
+        # `__node:=` remap would rename both to the same name and collide in
+        # the ROS graph (rosout/parameter-service conflicts).
         Node(
             package='morpheus_control',
             executable='morpheus_control.py',
-            name='morpheus_control',
             output='screen',
             parameters=[{
                 'use_sim_time': use_sim_time,
