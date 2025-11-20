@@ -1,39 +1,28 @@
 #!/bin/bash
 # =============================================
-#  Oscar / Morpheus 全系统自动启动脚本
+#  Morpheus full-stack launcher
 #  Author: SYH
 # =============================================
+set -e
 
-# ---- paths ----
-WORKSPACE=~/Documents/Master\ Thesis/morpheus_ws
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE="$SCRIPT_DIR/morpheus_ws"
 
-# ---- env ----
 source /opt/ros/humble/setup.bash
 cd "$WORKSPACE"
 source install/setup.bash
 
-# ---- start gazebo (bg) ----
-gnome-terminal -- bash -c "echo '[1/3] Launching Gazebo...'; \
-ros2 launch morpheus_simulation morpheus_spawn.launch.py; \
-exec bash"
+# morpheus_spawn.launch.py already brings up Gazebo, the controllers
+# (via morpheus_control.launch.py) and Nav2 — no need to launch them again.
+echo "[1/2] Launching simulation (Gazebo + control + Nav2)..."
+ros2 launch morpheus_simulation morpheus_spawn.launch.py &
+SIM_PID=$!
 
-# ---- start control (bg) ----
 sleep 10
-gnome-terminal -- bash -c "echo '[2/3] Launching morpheus_control...'; \
-source /opt/ros/humble/setup.bash; \
-cd '$WORKSPACE'; \
-source install/setup.bash; \
-ros2 launch morpheus_control morpheus_control.launch.py; \
-exec bash"
+echo "[2/2] Launching ArUco marker detection..."
+ros2 launch ros2_aruco aruco_recognition.launch.py &
+ARUCO_PID=$!
 
-# ---- start aruco (bg) ----
-sleep 5
-gnome-terminal -- bash -c "echo '[3/3] Launching ros2_aruco...'; \
-source /opt/ros/humble/setup.bash; \
-cd '$WORKSPACE'; \
-source install/setup.bash; \
-ros2 launch ros2_aruco aruco_recognition.launch.py; \
-exec bash"
-
-echo "✅ [Running] All nodes are up."
-
+echo "✅ [Running] All nodes are up. Press Ctrl+C to stop."
+trap 'kill "$SIM_PID" "$ARUCO_PID" 2>/dev/null' EXIT
+wait
