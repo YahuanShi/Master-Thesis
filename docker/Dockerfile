@@ -2,6 +2,17 @@ FROM osrf/ros:humble-desktop-full
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# All Morpheus nodes run inside this single container — no cross-machine ROS
+# communication is needed. This host has several down/leftover network
+# interfaces (dead onboard NIC, second USB-Ethernet, stale docker0 bridge)
+# that FastDDS enumerates for multicast discovery, producing
+# "Network is unreachable" / "sequence size exceeds remaining buffer" warnings
+# on every node. Restricting DDS to loopback avoids this entirely.
+# Set as a container-wide ENV (rather than via .bashrc) so it applies
+# regardless of how a process is launched — interactive shell, `docker exec`,
+# or a non-interactive script — since .bashrc only loads for interactive shells.
+ENV ROS_LOCALHOST_ONLY=1
+
 # Simulation / navigation / control stack used by the Morpheus rover but not
 # included in the base desktop-full image.
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -30,7 +41,14 @@ ARG USER_UID=1000
 ARG USER_GID=1000
 
 RUN groupadd --gid "$USER_GID" "$USERNAME" \
-    && useradd --uid "$USER_UID" --gid "$USER_GID" -m -s /bin/bash "$USERNAME" \
+    # GPU rendering (Gazebo's ogre2/EGL) needs direct access to the NVIDIA
+    # GPU's DRM render nodes (/dev/dri/renderD128, /dev/dri/card1 — both
+    # belong to PCI 65:00.0, the RTX A6000). `--gpus all` passes the device
+    # nodes through but not their owning groups (host: video=44, render=109);
+    # without membership, libEGL gets "Permission denied" and the renderer
+    # silently falls back to software rasterization (the cause of the stutter).
+    && groupadd -f --gid 109 render \
+    && useradd --uid "$USER_UID" --gid "$USER_GID" -G video,render -m -s /bin/bash "$USERNAME" \
     && echo "source /opt/ros/humble/setup.bash" >> "/home/$USERNAME/.bashrc"
 
 USER $USERNAME
