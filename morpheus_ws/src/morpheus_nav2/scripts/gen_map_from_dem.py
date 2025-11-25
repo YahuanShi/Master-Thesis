@@ -109,8 +109,13 @@ def main():
     origin = (-sx/2.0, -sy/2.0, 0.0)
 
     # 5) 写 map.yaml
+    # build_occupancy_from_dem() outputs white=obstacle/black=free (see its
+    # final comment); map_server's negate=0 expects the opposite
+    # (white=free/black=occupied), so negate=1 is required to read this
+    # image correctly. Without it, ~99% of the map comes back as "occupied"
+    # (including the rover's own footprint), and Nav2 can't plan any path.
     write_map_yaml(map_yaml, 'map.png', resolution, origin,
-                   negate=0, occ_thresh=0.65, free_thresh=0.2)
+                   negate=1, occ_thresh=0.65, free_thresh=0.2)
 
     print(f"[OK] map.png  -> {map_png}")
     print(f"[OK] map.yaml -> {map_yaml}")
