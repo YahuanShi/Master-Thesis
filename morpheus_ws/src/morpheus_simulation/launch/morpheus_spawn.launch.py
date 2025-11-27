@@ -77,6 +77,13 @@ def generate_launch_description():
             parameters=[
                 aruco_params,
                 {'image_topic': '/camera_2i'},
+                # gz-sensors' CameraSensor defaults to publishing CameraInfo on
+                # a single shared "/camera_info" topic, which collides between
+                # zed_2i and zed_mini (aruco_node latches the first CameraInfo
+                # it sees and never re-subscribes — it could silently lock onto
+                # zed_mini's intrinsics). gazebo.xacro now sets an explicit,
+                # unique <camera_info_topic> per camera; this must match
+                # zed_2i's value there, and bridge_camera_2i_info below.
                 {'camera_info_topic': '/camera_2i/camera_info'},
                 {'camera_frame': 'zed_2i_link'},
                 {'use_sim_time': use_sim_time},
@@ -238,7 +245,11 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Main camera info (zed_2i)
+    # Main camera info (zed_2i) — gazebo.xacro now sets an explicit
+    # <camera_info_topic>/camera_2i/camera_info</camera_info_topic> on the
+    # zed_2i sensor so its CameraInfo no longer collides with zed_mini's on
+    # gz-sensors' shared default "/camera_info" topic (see aruco_node's
+    # camera_info_topic comment above for why that collision matters).
     bridge_camera_2i_info = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',

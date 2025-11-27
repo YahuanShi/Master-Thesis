@@ -67,6 +67,16 @@
       <always_on>False</always_on>
       <visualize>False</visualize>
       <camera>
+        <!-- gz-sensors' CameraSensor publishes CameraInfo on a single
+             process-global "/camera_info" topic by default — when two camera
+             sensors are both active, their CameraInfo messages collide on
+             that shared topic and subscribers (e.g. ros2_aruco's aruco_node,
+             which latches onto whichever CameraInfo arrives first and never
+             re-subscribes) can silently lock onto the WRONG camera's
+             intrinsics. sdformat 1.9 added <camera_info_topic> precisely to
+             let each camera sensor publish on its own topic; set explicit,
+             distinct values here so zed_2i and zed_mini never collide. -->
+        <camera_info_topic>/camera_mini/camera_info</camera_info_topic>
         <horizontal_fov>1.78</horizontal_fov>
         <image>
           <width>1920.00</width>
@@ -88,6 +98,10 @@
       <always_on>True</always_on>
       <visualize>True</visualize>
       <camera>
+        <!-- See the camera_info_topic comment on zed_mini above — explicit,
+             distinct topic so this camera's intrinsics never collide with
+             zed_mini's on the shared default "/camera_info". -->
+        <camera_info_topic>/camera_2i/camera_info</camera_info_topic>
         <horizontal_fov>1.91</horizontal_fov>
         <image>
           <width>1920.00</width>
