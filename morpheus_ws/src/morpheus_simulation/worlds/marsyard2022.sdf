@@ -89,5 +89,15 @@
       <name>ar_box_6</name>
       <uri>model://aruco_box</uri>
     </include>
+
+    <!-- 0.5 m flat ArUco marker (DICT_5X5_50, ID 0) facing the rover's
+         zed_2i camera. Placed 2 m ahead and 0.5 m to the right of the
+         spawn position (0, 4, 1.5) to avoid robotic-arm occlusion.
+         Yaw = pi so the marker's +X face points toward the rover. -->
+    <include>
+      <pose>2.0 3.5 1.5 0 0 3.14159</pose>
+      <name>ar_marker_front</name>
+      <uri>model://aruco_marker_0</uri>
+    </include>
   </world>
 </sdf>

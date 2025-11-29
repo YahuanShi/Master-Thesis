@@ -86,6 +86,12 @@ def generate_launch_description():
                 # zed_2i's value there, and bridge_camera_2i_info below.
                 {'camera_info_topic': '/camera_2i/camera_info'},
                 {'camera_frame': 'zed_2i_link'},
+                # aruco_parameters.yaml is loaded under /aruco_node but this
+                # node is renamed to aruco_detector_2i, so the yaml values
+                # are silently ignored — override the two detection-critical
+                # params here to match the aruco_box models in the world.
+                {'marker_size': 0.1},
+                {'aruco_dictionary_id': 'DICT_5X5_50'},
                 {'use_sim_time': use_sim_time},
             ],
             output='screen',
