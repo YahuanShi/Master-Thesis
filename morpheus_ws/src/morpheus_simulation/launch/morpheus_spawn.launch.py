@@ -358,9 +358,7 @@ def generate_launch_description():
         activate_nav2,
 
         # 可选
-        # aruco_node,
         # bridge_camera_mini,
-        # bridge_camera_info,
         # rviz,
     ]
 
