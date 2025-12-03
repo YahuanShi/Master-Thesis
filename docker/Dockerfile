@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-humble-ros2-controllers \
         ros-humble-navigation2 \
         ros-humble-nav2-bringup \
+        ros-humble-slam-toolbox \
         ros-humble-robot-localization \
         ros-humble-twist-mux \
         ros-humble-teleop-twist-joy \
@@ -49,7 +50,25 @@ RUN groupadd --gid "$USER_GID" "$USERNAME" \
     # silently falls back to software rasterization (the cause of the stutter).
     && groupadd -f --gid 109 render \
     && useradd --uid "$USER_UID" --gid "$USER_GID" -G video,render -m -s /bin/bash "$USERNAME" \
-    && echo "source /opt/ros/humble/setup.bash" >> "/home/$USERNAME/.bashrc"
+    && echo "source /opt/ros/humble/setup.bash" >> "/home/$USERNAME/.bashrc" \
+    && echo "source /tmp/slam_toolbox_src/install/setup.bash" >> "/home/$USERNAME/.bashrc"
+
+# Build slam_toolbox from source with a patched getOdomPose().
+# The stock implementation uses tf_->transform() with the exact scan timestamp
+# and zero timeout.  In Gazebo sim the single-threaded executor prevents /tf
+# callbacks from running while the scan callback is active, so the TF buffer
+# never contains the required stamp — every scan silently fails.  A blocking
+# timeout deadlocks for the same reason.  The fix: lookupTransform with
+# TimePointZero (latest available transform, non-blocking).
+COPY slam_toolbox_tf_fix.patch /tmp/
+RUN bash -c '\
+    source /opt/ros/humble/setup.bash \
+    && git clone --depth 1 -b humble https://github.com/SteveMacenski/slam_toolbox.git /tmp/slam_toolbox_src \
+    && cd /tmp/slam_toolbox_src \
+    && git apply /tmp/slam_toolbox_tf_fix.patch \
+    && colcon build --packages-select slam_toolbox --cmake-args -DCMAKE_BUILD_TYPE=Release \
+    && rm -rf build log src /tmp/slam_toolbox_tf_fix.patch \
+    '
 
 USER $USERNAME
 WORKDIR /workspace/Morpheus

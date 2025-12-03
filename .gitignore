@@ -32,5 +32,6 @@ log/
 *.swo
 .DS_Store
 .vscode/
-.vscode/
-.vscode/
+TODO.md
+frames_*.gv
+frames_*.pdf

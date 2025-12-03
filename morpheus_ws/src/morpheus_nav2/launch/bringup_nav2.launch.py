@@ -1,6 +1,6 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
@@ -16,14 +16,18 @@ def generate_launch_description():
     params_file    = LaunchConfiguration('params_file',    default=os.path.join(pkg, 'config', 'nav2_params.yaml'))
     map_yaml       = LaunchConfiguration('map',            default=os.path.join(pkg, 'config', 'map.yaml'))
     autostart      = LaunchConfiguration('autostart',      default='true')
-    # 让 Nav2 的速度输出到 /cmd_vel_nav，供 twist_mux 仲裁
     cmd_vel_topic  = LaunchConfiguration('cmd_vel_topic',  default='/cmd_vel_nav')
 
-    # teleop_twist_joy + twist_mux（optional）
+    mode           = LaunchConfiguration('mode',           default='localization')
+    slam_params    = LaunchConfiguration('slam_params',    default=os.path.join(pkg, 'config', 'slam_toolbox.yaml'))
+
     with_teleop    = LaunchConfiguration('with_teleop',    default='true')
-    with_joy       = LaunchConfiguration('with_joy',       default='false')  # 若你的 joy_node 在别处已启动，保持 false
+    with_joy       = LaunchConfiguration('with_joy',       default='false')
     teleop_cfg     = LaunchConfiguration('teleop_cfg',     default=os.path.join(pkg, 'config', 'teleop_joy.yaml'))
     twist_mux_cfg  = LaunchConfiguration('twist_mux_cfg',  default=os.path.join(pkg, 'config', 'twist_mux.yaml'))
+
+    is_localization = PythonExpression(["'", mode, "' == 'localization'"])
+    is_mapping      = PythonExpression(["'", mode, "' == 'mapping'"])
 
     declare_use_sim_time = DeclareLaunchArgument(
         'use_sim_time', default_value=use_sim_time,
@@ -44,6 +48,14 @@ def generate_launch_description():
     declare_cmd_vel_topic = DeclareLaunchArgument(
         'cmd_vel_topic', default_value=cmd_vel_topic,
         description='Where controller_server/behavior_server publish cmd_vel (feeds twist_mux)'
+    )
+    declare_mode = DeclareLaunchArgument(
+        'mode', default_value=mode,
+        description="'localization' (AMCL + map_server) or 'mapping' (slam_toolbox online SLAM)"
+    )
+    declare_slam_params = DeclareLaunchArgument(
+        'slam_params', default_value=slam_params,
+        description='Full path to slam_toolbox YAML config'
     )
 
     declare_with_teleop = DeclareLaunchArgument(
@@ -67,13 +79,15 @@ def generate_launch_description():
     # Nav2 Nodes
     # ---------------------------
 
+    # --- Localization mode: map_server + AMCL ---
     map_server = Node(
         package='nav2_map_server',
         executable='map_server',
         name='map_server',
         output='screen',
         parameters=[params_file, {'use_sim_time': use_sim_time},
-                    {'yaml_filename': map_yaml}]
+                    {'yaml_filename': map_yaml}],
+        condition=IfCondition(is_localization)
     )
 
     amcl = Node(
@@ -81,7 +95,18 @@ def generate_launch_description():
         executable='amcl',
         name='amcl',
         output='screen',
-        parameters=[params_file, {'use_sim_time': use_sim_time}]
+        parameters=[params_file, {'use_sim_time': use_sim_time}],
+        condition=IfCondition(is_localization)
+    )
+
+    # --- Mapping mode: slam_toolbox online async ---
+    slam_toolbox = Node(
+        package='slam_toolbox',
+        executable='async_slam_toolbox_node',
+        name='slam_toolbox',
+        output='screen',
+        parameters=[slam_params, {'use_sim_time': use_sim_time}],
+        condition=IfCondition(is_mapping)
     )
 
     planner = Node(
@@ -129,7 +154,7 @@ def generate_launch_description():
         parameters=[params_file, {'use_sim_time': use_sim_time}]
     )
 
-    lifecycle_mgr = Node(
+    lifecycle_mgr_loc = Node(
         package='nav2_lifecycle_manager',
         executable='lifecycle_manager',
         name='lifecycle_manager_navigation',
@@ -146,7 +171,27 @@ def generate_launch_description():
                 'behavior_server',
                 'bt_navigator'
             ]
-        }]
+        }],
+        condition=IfCondition(is_localization)
+    )
+
+    lifecycle_mgr_map = Node(
+        package='nav2_lifecycle_manager',
+        executable='lifecycle_manager',
+        name='lifecycle_manager_navigation',
+        output='screen',
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'autostart': autostart,
+            'node_names': [
+                'planner_server',
+                'controller_server',
+                'smoother_server',
+                'behavior_server',
+                'bt_navigator'
+            ]
+        }],
+        condition=IfCondition(is_mapping)
     )
 
     # ---------------------------
@@ -188,20 +233,26 @@ def generate_launch_description():
         declare_map_yaml,
         declare_autostart,
         declare_cmd_vel_topic,
+        declare_mode,
+        declare_slam_params,
         declare_with_teleop,
         declare_with_joy,
         declare_teleop_cfg,
         declare_twist_mux_cfg,
 
-        # Nav2
+        # Localization mode
         map_server,
         amcl,
+        # Mapping mode
+        slam_toolbox,
+        # Shared Nav2 nodes
         planner,
         controller,
         smoother,
         behavior,
         bt_nav,
-        lifecycle_mgr,
+        lifecycle_mgr_loc,
+        lifecycle_mgr_map,
 
         # teleop + mux
         joy_node,
