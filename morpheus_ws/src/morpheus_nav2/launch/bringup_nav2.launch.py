@@ -154,6 +154,14 @@ def generate_launch_description():
         parameters=[params_file, {'use_sim_time': use_sim_time}]
     )
 
+    waypoint_follower = Node(
+        package='nav2_waypoint_follower',
+        executable='waypoint_follower',
+        name='waypoint_follower',
+        output='screen',
+        parameters=[params_file, {'use_sim_time': use_sim_time}]
+    )
+
     lifecycle_mgr_loc = Node(
         package='nav2_lifecycle_manager',
         executable='lifecycle_manager',
@@ -169,7 +177,8 @@ def generate_launch_description():
                 'controller_server',
                 'smoother_server',
                 'behavior_server',
-                'bt_navigator'
+                'bt_navigator',
+                'waypoint_follower'
             ]
         }],
         condition=IfCondition(is_localization)
@@ -188,7 +197,8 @@ def generate_launch_description():
                 'controller_server',
                 'smoother_server',
                 'behavior_server',
-                'bt_navigator'
+                'bt_navigator',
+                'waypoint_follower'
             ]
         }],
         condition=IfCondition(is_mapping)
@@ -251,6 +261,7 @@ def generate_launch_description():
         smoother,
         behavior,
         bt_nav,
+        waypoint_follower,
         lifecycle_mgr_loc,
         lifecycle_mgr_map,
 

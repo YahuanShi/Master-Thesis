@@ -1,0 +1,17 @@
+waypoints:
+  - name: "marker_front"
+    x: 1.0
+    y: 3.5
+    yaw: 3.14
+  - name: "box_5_approach"
+    x: -1.5
+    y: 3.0
+    yaw: -2.36
+  - name: "south_patrol"
+    x: 0.0
+    y: 2.5
+    yaw: -1.57
+  - name: "return_home"
+    x: 0.0
+    y: 4.0
+    yaw: 0.0
