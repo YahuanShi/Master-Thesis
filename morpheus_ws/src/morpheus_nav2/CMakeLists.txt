@@ -7,7 +7,9 @@ install(DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME}
 )
 
-install(PROGRAMS scripts/patrol_mission.py
+install(PROGRAMS
+  scripts/patrol_mission.py
+  scripts/ground_segmentation.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

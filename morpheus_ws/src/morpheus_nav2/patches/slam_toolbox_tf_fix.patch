@@ -1,6 +1,6 @@
 --- a/include/slam_toolbox/get_pose_helper.hpp
 +++ b/include/slam_toolbox/get_pose_helper.hpp
-@@ -41,22 +41,19 @@ public:
+@@ -41,22 +41,16 @@ public:
 
    bool getOdomPose(karto::Pose2 & karto_pose, const rclcpp::Time & t)
    {
@@ -11,11 +11,6 @@
 -
      try {
 -      odom_pose = tf_->transform(base_ident, odom_frame_);
-+      // Use latest available transform instead of exact scan timestamp.
-+      // In Gazebo sim with a single-threaded executor the TF buffer may not
-+      // yet contain the exact scan timestamp when the callback fires; zero
-+      // timeout fails, blocking timeout deadlocks.  TimePointZero returns the
-+      // most recent transform without blocking.
 +      auto odom_pose = tf_->lookupTransform(
 +        odom_frame_, base_frame_, tf2::TimePointZero);
 +      const double yaw = tf2::getYaw(odom_pose.transform.rotation);

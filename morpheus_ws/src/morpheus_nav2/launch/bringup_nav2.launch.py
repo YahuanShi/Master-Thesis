@@ -76,6 +76,17 @@ def generate_launch_description():
     )
 
     # ---------------------------
+    # Point cloud ground segmentation
+    # ---------------------------
+    ground_seg = Node(
+        package='morpheus_nav2',
+        executable='ground_segmentation.py',
+        name='ground_segmentation',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}]
+    )
+
+    # ---------------------------
     # Nav2 Nodes
     # ---------------------------
 
@@ -249,6 +260,9 @@ def generate_launch_description():
         declare_with_joy,
         declare_teleop_cfg,
         declare_twist_mux_cfg,
+
+        # Ground segmentation (feeds voxel_layer)
+        ground_seg,
 
         # Localization mode
         map_server,
