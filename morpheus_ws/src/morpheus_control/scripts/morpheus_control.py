@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-import math
 import threading
 
 from geometry_msgs.msg import Twist
@@ -9,6 +8,8 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
 from std_msgs.msg import Float64MultiArray
+
+from kinematics import ChassisParams, compute_drive
 
 # Lock-protected shared state between Joy_subscriber and Robot_control.
 # Joy_subscriber writes; Robot_control reads inside its timer callback.
@@ -21,13 +22,8 @@ class Robot_control(Node):
     def __init__(self):
         super().__init__('robot_control')
 
-        self.wheel_base = 1.072
-        self.wheel_radius = 0.125
-        self.wheel_steering_y_offset = 0.0
-        self.wheel_seperation = 0.615
-        self.steering_track = self.wheel_seperation - 2*self.wheel_steering_y_offset
-
         self.drive_gain = float(self.declare_parameter('drive_gain', 10.0).value)
+        self.chassis = ChassisParams(drive_gain=self.drive_gain)
 
         self.pos = np.array([0.0, 0.0, 0.0, 0.0], float)
         self.vel = np.array([0.0, 0.0, 0.0, 0.0], float)
@@ -43,8 +39,6 @@ class Robot_control(Node):
 
         self.timer = self.create_timer(0.01, self.timer_callback)
 
-        self.deadzone = 0.05
-
     def cmd_vel_cb(self, msg: Twist):
         self.base_cmd = msg
 
@@ -57,75 +51,12 @@ class Robot_control(Node):
             joy_ay = _joy_axes.angular.y
 
         if mode_selection == 4:
-            vx = self.base_cmd.linear.x
-            vy = self.base_cmd.linear.y
-            wz = self.base_cmd.angular.z
-
-            if abs(vx) < self.deadzone: vx = 0.0
-            if abs(vy) < self.deadzone: vy = 0.0
-            if abs(wz) < self.deadzone: wz = 0.0
-
-            if wz != 0.0:
-                if vx != 0.0:
-                    # Ackermann mixed steering
-                    factor = self.drive_gain
-
-                    if abs(wz) < 1e-5:
-                        self.pos[:] = 0.0
-                    else:
-                        r = abs(vx) / wz * 2*math.pi
-                        r_bl = r + self.steering_track / 2.0
-                        r_br = r - self.steering_track / 2.0
-
-                        a_fl = math.atan(self.wheel_base / r_bl)
-                        a_fr = math.atan(self.wheel_base / r_br)
-
-                        if r_bl > 0 and r < 0:
-                            a_fl -= math.pi
-                        if r_br < 0 and r > 0:
-                            a_fr += math.pi
-
-                        self.pos[0] = a_fl * 1.57
-                        self.pos[1] = a_fr * 1.57
-
-                    vel_steerring_offset = wz * self.wheel_steering_y_offset
-                    sign = np.sign(vx) if vx != 0.0 else 1.0
-
-                    self.vel[0] = sign*math.hypot(vx - wz*self.steering_track/2.0,
-                                                   wz*self.wheel_base/2.0) - vel_steerring_offset
-                    self.vel[1] = sign*math.hypot(vx + wz*self.steering_track/2.0,
-                                                   wz*self.wheel_base/2.0) + vel_steerring_offset
-                    self.vel[2] = self.vel[0]
-                    self.vel[3] = self.vel[1]
-                    self.vel[:] *= factor
-
-                else:
-                    # Pivot turn
-                    factor = self.drive_gain
-                    ang = math.atan(self.wheel_base/self.steering_track)
-                    self.pos[0] = -ang
-                    self.pos[1] =  ang
-                    self.pos[2] =  ang
-                    self.pos[3] = -ang
-                    self.vel[0] = -wz
-                    self.vel[1] =  wz
-                    self.vel[2] = -wz
-                    self.vel[3] =  wz
-                    self.vel[:] *= factor
-            else:
-                # Crab walk
-                factor = self.drive_gain
-                if vx <= 0.0 and vy == 0.0:
-                    self.pos[:] = 0.0
-                else:
-                    angle = math.atan2(vy, vx) if (vx != 0.0 or vy != 0.0) else 0.0
-                    if abs(angle) >= math.pi/2:
-                        angle = (-1)*np.sign(angle)*(math.pi - abs(angle))
-                    self.pos[:] = angle
-
-                magnitude = math.hypot(vx, vy)
-                sign = 1.0 if vx > 0.0 else -1.0 if vx < 0.0 else 1.0
-                self.vel[:] = magnitude * sign * factor
+            self.pos, self.vel = compute_drive(
+                self.base_cmd.linear.x,
+                self.base_cmd.linear.y,
+                self.base_cmd.angular.z,
+                self.chassis,
+            )
 
         # Robotic arm joint control
         if mode_selection == 5:
