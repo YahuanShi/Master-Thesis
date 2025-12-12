@@ -1,87 +1,196 @@
 # Morpheus
 
-Morpheus is a simulated planetary rover built on **ROS 2 (Humble)** and **Gazebo**, operating in a recreated **MarsYard** terrain (with an additional NVIDIA Isaac Sim variant). The rover combines a four-wheel independent-steering chassis with a 7-DOF robotic arm, and the repository covers the full stack from robot description and low-level control to perception and autonomous navigation.
+Morpheus is a simulated planetary rover built with **ROS 2 Humble**, **Gazebo / GZ Sim**, **Nav2**, `ros2_control`, and a custom Mars Yard environment.
 
-This project is a personal sandbox for learning and practicing core robotics topics, in particular:
+The project is a robotics learning and systems-integration showcase: it brings together robot modeling, simulation, rover kinematics, autonomous navigation, SLAM, perception, sensor fusion, manipulation, and mission-level autonomy in one ROS 2 workspace.
 
-- **Motion planning & navigation** — Nav2-based autonomous navigation (AMCL localization, planner/controller/smoother/behavior servers) on a custom MarsYard occupancy map generated from a digital elevation model.
-- **Perception & sensor fusion** — stereo camera (ZED), LiDAR (scan + point cloud), IMU, ArUco marker detection, and EKF-based state estimation fusing odometry and IMU data.
-- **Control algorithms** — chassis kinematics for independent four-wheel steering (Ackermann mixed steering, in-place pivot turn, crab walk), `ros2_control` based joint controllers, and joystick teleoperation of both the chassis and the robotic arm.
+## What It Does
 
-> **Status**: work in progress — the project is not fully complete yet, and more documentation/details will be added over time.
+Morpheus simulates a Mars rover that can drive, localize, map, navigate through rough terrain, detect visual markers, follow patrol missions, and control a robotic arm.
+
+The stack includes:
+
+- A four-wheel independently steered rover chassis
+- A 7-DOF robotic arm with gripper/drill tooling
+- A custom Mars Yard Gazebo world with terrain, obstacles, and ArUco targets
+- LiDAR, stereo cameras, IMU, odometry, and point cloud processing
+- Nav2 autonomous navigation with localization, planning, control, recovery, and waypoint following
+- Online SLAM for unknown-environment mapping
+- EKF-based sensor fusion
+- 3D costmaps using segmented point clouds
+- Joystick teleoperation for both the rover base and arm
+- ArUco marker detection and marker-based mission behaviors
+- MoveIt2-style arm planning and Cartesian end-effector control
+- Visual odometry / visual SLAM integration as an additional localization source
+- Custom Nav2 behavior-tree logic for task-aware autonomy
+- Diagnostics, monitoring, RViz visualization, and test coverage
+
+## Why I Built It
+
+Morpheus is a project for practicing the core skills needed to build mobile robot software:
+
+- Modeling a robot in URDF/xacro
+- Connecting Gazebo simulation with ROS 2 topics, TF, sensors, and controllers
+- Implementing rover kinematics for Ackermann steering, pivot turns, and crab walking
+- Using `ros2_control` for joint-level command interfaces
+- Building a Nav2 navigation stack from map, localization, planner, controller, costmaps, and lifecycle nodes
+- Using SLAM, visual odometry, IMU, and wheel/ground-truth odometry for state estimation
+- Processing 2D and 3D perception data for obstacle avoidance
+- Designing autonomous waypoint missions with perception-triggered behaviors
+- Structuring a multi-package ROS 2 workspace with launch files, configs, tests, and Docker support
+
+## Main Features
+
+### Rover Simulation
+
+The rover runs in Gazebo on a Mars Yard terrain model. The simulation includes the robot model, physics, sensors, controller interfaces, ROS-Gazebo bridges, and RViz visualization.
+
+### Chassis Control
+
+The base controller converts `/cmd_vel` into steering angles and wheel velocities for a four-wheel independently steered rover.
+
+Supported drive modes include:
+
+- Straight driving
+- Ackermann-style turning
+- In-place pivot turns
+- Crab walking
+
+### Navigation and Mapping
+
+Morpheus uses Nav2 for autonomous navigation. It supports both map-based localization and online mapping:
+
+- AMCL localization on a prebuilt occupancy map
+- `slam_toolbox` online SLAM
+- Nav2 planner, controller, smoother, behavior server, and BT navigator
+- Waypoint following and patrol missions
+- Static, 2D LiDAR, and 3D point-cloud costmap sources
+
+### Perception
+
+The simulated sensor stack includes:
+
+- LiDAR scan and point cloud
+- Stereo camera streams
+- IMU
+- Gazebo odometry
+- ArUco marker detection
+- Ground/obstacle point cloud segmentation
+- Visual odometry / visual SLAM input for localization
+
+### Sensor Fusion
+
+State estimation is handled through an EKF that combines odometry, IMU, and visual localization sources into a consistent TF tree for Nav2.
+
+### Mission Autonomy
+
+The patrol mission system loads waypoints from YAML, sends goals to Nav2, waits at each target, checks for ArUco markers, and continues or recovers based on task state.
+
+Custom behavior-tree logic adds task-aware autonomy such as stopping for marker inspection, retrying failed goals, and scanning when navigation fails.
+
+### Manipulation
+
+The rover includes a 7-DOF arm with joint-level teleoperation and motion-planning support for Cartesian end-effector goals, inverse kinematics, and obstacle-aware planning.
+
+### Testing
+
+The project includes tests for:
+
+- Rover kinematics
+- Control-node command output
+- URDF/xacro validity
+- Link and joint consistency
+- Launch-level controller behavior
 
 ## Repository Layout
 
-```
+```text
 Morpheus/
-├── MarsYard2024/          # Terrain assets (mesh, materials, textures, USD configs) — Git LFS
-├── morpheus_isaac.usd     # Isaac Sim scene variant of the robot
-├── run_morpheus_all.sh    # Convenience script to launch the full stack
+├── docker/                     # Reproducible ROS 2 / Gazebo environment
+├── MarsYard2024/               # Mars Yard mesh, texture, and USD assets
+├── morpheus_isaac.usd          # Isaac Sim scene variant
+├── run_morpheus_all.sh         # Full-stack launcher
 └── morpheus_ws/src/
-    ├── morpheus_description/  # URDF/xacro robot model (chassis, suspension, arm, sensors)
-    ├── morpheus_simulation/   # Gazebo world bring-up, robot spawning, ROS↔Gazebo bridges
-    ├── morpheus_control/      # Chassis kinematics & joystick control (drive + arm modes)
-    ├── morpheus_nav2/         # Nav2 bring-up, map generation, EKF, twist_mux, teleop config
-    └── ros2_aruco/            # Vendored third-party package for ArUco marker detection
+    ├── morpheus_description/   # URDF/xacro robot model and meshes
+    ├── morpheus_simulation/    # Gazebo worlds, spawning, bridges
+    ├── morpheus_control/       # Rover kinematics and joystick/base control
+    ├── morpheus_nav2/          # Nav2, SLAM, maps, missions, perception helpers
+    └── ros2_aruco/             # ArUco marker detection package
 ```
 
-## Robot Overview
+## Quick Start
 
-- **Chassis**: four independently steered/driven wheels (`steering_*` + `wheel_*`) on a strut/shaft suspension, ~27 kg.
-- **Arm**: 7-DOF manipulator (`arm_base → shoulder → elbow → wrist_1 → wrist_2 → wrist_3 → gripper`), with a fixed drill end-effector option.
-- **Sensors**: Ouster LiDAR, ZED 2i and ZED Mini stereo cameras, IMU, plus sample-box payload mounts.
-
-## Getting Started
-
-The simulation stack (Gazebo, Nav2, `ros2_control`, sensor fusion, …) has a long
-and version-sensitive dependency chain, so the recommended way to build and run
-it is inside the provided Docker container — this keeps the setup reproducible
-and isolated from other projects on the host.
-
-### Option A: Docker (recommended)
-
-Requires Docker and, for GPU-accelerated rendering, the NVIDIA Container
-Toolkit.
+The recommended way to run the project is with Docker.
 
 ```bash
 ./docker/run.sh
 ```
 
-This builds an image with all required ROS 2 Humble packages (Gazebo/`ros_gz`,
-Nav2, `ros2_control`, `robot_localization`, `twist_mux`, …), then drops you into
-a shell with the project mounted at `/workspace/Morpheus`, GPU + X11 + joystick
-passthrough enabled. From there:
+Inside the container:
 
 ```bash
-cd morpheus_ws
-colcon build
+cd /workspace/Morpheus/morpheus_ws
+colcon build --symlink-install
 source install/setup.bash
+
+cd /workspace/Morpheus
 ./run_morpheus_all.sh
 ```
 
-### Option B: Native install
-
-If you'd rather install everything directly on the host:
+Run with online SLAM:
 
 ```bash
-# Build the workspace
-cd morpheus_ws
-source /opt/ros/humble/setup.bash
-colcon build
-source install/setup.bash
+./run_morpheus_all.sh mode:=mapping
+```
 
-# Launch the full stack (Gazebo + control + perception)
+Run with map-based localization:
+
+```bash
+./run_morpheus_all.sh mode:=localization
+```
+
+## Useful Commands
+
+Launch the full stack:
+
+```bash
 ./run_morpheus_all.sh
 ```
 
-Or launch individual pieces directly, e.g.:
+Launch Nav2 directly:
 
 ```bash
-ros2 launch morpheus_simulation morpheus_spawn.launch.py
-ros2 launch morpheus_control morpheus_control.launch.py
-ros2 launch morpheus_nav2 bringup_nav2.launch.py
+ros2 launch morpheus_nav2 bringup_nav2.launch.py mode:=localization
 ```
+
+Run the patrol mission:
+
+```bash
+ros2 run morpheus_nav2 patrol_mission.py
+```
+
+Run tests:
+
+```bash
+cd morpheus_ws
+colcon test --packages-select morpheus_control morpheus_description
+colcon test-result --verbose
+```
+
+## Tech Stack
+
+- ROS 2 Humble
+- Gazebo / GZ Sim
+- Nav2
+- `ros2_control`
+- `slam_toolbox`
+- `robot_localization`
+- MoveIt2
+- RViz
+- Python / rclpy
+- URDF / xacro
+- Docker
 
 ## License
 
-MIT — see [LICENSE](LICENSE). The vendored `ros2_aruco` package retains its original MIT license and authorship.
+MIT. See [LICENSE](LICENSE).
