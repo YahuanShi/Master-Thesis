@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot name="morpheus_rover">
+
+  <!-- 6-DOF arm planning group (chain from chassis to wrist tip) -->
+  <group name="arm">
+    <chain base_link="chassis_link" tip_link="wrist_3_link"/>
+  </group>
+
+  <!-- Gripper planning group (single actuated joint; right finger mimics left) -->
+  <group name="gripper">
+    <joint name="gripper_left_joint"/>
+    <joint name="gripper_right_joint"/>
+  </group>
+
+  <!-- Mark gripper as the end effector attached to the arm -->
+  <end_effector name="gripper" parent_link="wrist_3_link"
+                group="gripper" parent_group="arm"/>
+
+  <!-- Named arm poses -->
+  <group_state name="home" group="arm">
+    <joint name="arm_base_joint"  value="0.0"/>
+    <joint name="shoulder_joint"  value="0.0"/>
+    <joint name="elbow_joint"     value="0.0"/>
+    <joint name="wrist_1_joint"   value="0.0"/>
+    <joint name="wrist_2_joint"   value="0.0"/>
+    <joint name="wrist_3_joint"   value="0.0"/>
+  </group_state>
+
+  <group_state name="stow" group="arm">
+    <joint name="arm_base_joint"  value="0.0"/>
+    <joint name="shoulder_joint"  value="-1.2"/>
+    <joint name="elbow_joint"     value="1.2"/>
+    <joint name="wrist_1_joint"   value="0.0"/>
+    <joint name="wrist_2_joint"   value="0.0"/>
+    <joint name="wrist_3_joint"   value="0.0"/>
+  </group_state>
+
+  <group_state name="open" group="gripper">
+    <joint name="gripper_left_joint" value="0.28"/>
+  </group_state>
+
+  <group_state name="closed" group="gripper">
+    <joint name="gripper_left_joint" value="0.0"/>
+  </group_state>
+
+  <!-- Allowed Collision Matrix — adjacent link pairs that always touch -->
+  <disable_collisions link1="chassis_link"    link2="arm_base_link"   reason="Adjacent"/>
+  <disable_collisions link1="arm_base_link"   link2="shoulder_link"   reason="Adjacent"/>
+  <disable_collisions link1="shoulder_link"   link2="elbow_link"      reason="Adjacent"/>
+  <disable_collisions link1="elbow_link"      link2="wrist_1_link"    reason="Adjacent"/>
+  <disable_collisions link1="wrist_1_link"    link2="wrist_2_link"    reason="Adjacent"/>
+  <disable_collisions link1="wrist_2_link"    link2="wrist_3_link"    reason="Adjacent"/>
+  <disable_collisions link1="wrist_3_link"    link2="gripper_left_link"  reason="Adjacent"/>
+  <disable_collisions link1="wrist_3_link"    link2="gripper_right_link" reason="Adjacent"/>
+  <disable_collisions link1="gripper_left_link" link2="gripper_right_link" reason="Adjacent"/>
+
+  <!-- Chassis ↔ nearby fixed parts (drill, sample boxes, shaft/strut) -->
+  <disable_collisions link1="chassis_link"    link2="drill_link"      reason="Adjacent"/>
+  <disable_collisions link1="chassis_link"    link2="shaft_left_link" reason="Adjacent"/>
+  <disable_collisions link1="chassis_link"    link2="shaft_right_link" reason="Adjacent"/>
+
+</robot>

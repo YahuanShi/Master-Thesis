@@ -30,6 +30,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-humble-joint-state-publisher-gui \
         ros-humble-joy \
         ros-humble-tf-transformations \
+        ros-humble-moveit \
+        ros-humble-moveit-servo \
         python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
 
