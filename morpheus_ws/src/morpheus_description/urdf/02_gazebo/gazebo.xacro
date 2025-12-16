@@ -90,7 +90,7 @@
     </sensor>
   </gazebo>
   <gazebo reference="zed_2i_link">
-    <sensor name="zed_2i" type="camera">
+    <sensor name="zed_2i" type="rgbd_camera">
       <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
       <gz_frame_id>chassis_link</gz_frame_id>
       <topic>/camera_2i</topic>
@@ -98,15 +98,19 @@
       <always_on>True</always_on>
       <visualize>True</visualize>
       <camera>
-        <!-- See the camera_info_topic comment on zed_mini above — explicit,
-             distinct topic so this camera's intrinsics never collide with
-             zed_mini's on the shared default "/camera_info". -->
         <camera_info_topic>/camera_2i/camera_info</camera_info_topic>
         <horizontal_fov>1.91</horizontal_fov>
         <image>
-          <width>1920.00</width>
-          <height>1080.00</height>
+          <width>640</width>
+          <height>360</height>
+          <format>R8G8B8</format>
         </image>
+        <depth_camera>
+          <clip>
+            <near>0.3</near>
+            <far>15.0</far>
+          </clip>
+        </depth_camera>
         <clip>
           <near>0.02</near>
           <far>40.00</far>

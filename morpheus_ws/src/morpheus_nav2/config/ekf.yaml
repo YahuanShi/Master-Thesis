@@ -49,6 +49,20 @@ ekf:
     # imu0_queue_size: 50
 
     #################################################################
+    # Sensor 3: Visual Odometry (rtabmap rgbd_odometry)
+    # Differential mode — fuse velocity increments, not absolute pose,
+    # to avoid conflicts with the Gazebo ground-truth odom source.
+    #################################################################
+    odom1: /visual_odom
+    odom1_config: [false, false, false,   # x, y, z
+                   false, false, false,   # roll, pitch, yaw
+                   true,  true,  false,   # vx, vy, vz
+                   false, false, true,    # vroll, vpitch, vyaw
+                   false, false, false]   # ax, ay, az
+    odom1_differential: true
+    odom1_relative:     false
+
+    #################################################################
     # Other Common Parameters (tune as needed)
     #################################################################
     sensor_timeout: 0.1

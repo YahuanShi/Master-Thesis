@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-humble-tf-transformations \
         ros-humble-moveit \
         ros-humble-moveit-servo \
+        ros-humble-rtabmap-ros \
         python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
 

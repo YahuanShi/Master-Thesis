@@ -76,6 +76,25 @@ def generate_launch_description():
     )
 
     # ---------------------------
+    # Visual odometry (rtabmap rgbd_odometry)
+    # ---------------------------
+    vo_params = os.path.join(pkg, 'config', 'visual_odom.yaml')
+
+    visual_odom = Node(
+        package='rtabmap_odom',
+        executable='rgbd_odometry',
+        name='rgbd_odometry',
+        output='screen',
+        parameters=[vo_params, {'use_sim_time': use_sim_time}],
+        remappings=[
+            ('rgb/image', '/camera_2i'),
+            ('depth/image', '/camera_2i/depth_image'),
+            ('rgb/camera_info', '/camera_2i/camera_info'),
+            ('odom', '/visual_odom'),
+        ],
+    )
+
+    # ---------------------------
     # Point cloud ground segmentation
     # ---------------------------
     ground_seg = Node(
@@ -260,6 +279,9 @@ def generate_launch_description():
         declare_with_joy,
         declare_teleop_cfg,
         declare_twist_mux_cfg,
+
+        # Visual odometry (feeds EKF as odom1)
+        visual_odom,
 
         # Ground segmentation (feeds voxel_layer)
         ground_seg,

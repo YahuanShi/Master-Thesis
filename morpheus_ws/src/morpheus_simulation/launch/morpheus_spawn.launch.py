@@ -267,6 +267,24 @@ def generate_launch_description():
         output='screen',
     )
 
+    # Depth image from zed_2i (rgbd_camera sensor)
+    bridge_depth_2i = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='bridge_depth_2i',
+        arguments=['/camera_2i/depth_image@sensor_msgs/msg/Image@gz.msgs.Image'],
+        output='screen',
+    )
+
+    # Depth point cloud from zed_2i
+    bridge_depth_cloud_2i = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='bridge_depth_cloud_2i',
+        arguments=['/camera_2i/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked'],
+        output='screen',
+    )
+
     # Mini camera (Robotic arm)
     bridge_camera_mini = Node(
         package='ros_gz_bridge',
@@ -360,7 +378,9 @@ def generate_launch_description():
         bridge_odom,
         bridge_imu,
         bridge_cloud,
-        
+        bridge_depth_2i,
+        bridge_depth_cloud_2i,
+
         ekf_node,
         activate_nav2,
 

@@ -29,6 +29,7 @@
   <exec_depend>twist_mux</exec_depend>
   <exec_depend>python3-opencv</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>rtabmap_odom</exec_depend>
 
 
   <!-- messages -->

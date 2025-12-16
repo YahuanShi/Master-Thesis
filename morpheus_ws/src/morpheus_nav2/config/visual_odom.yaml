@@ -1,0 +1,18 @@
+rgbd_odometry:
+  ros__parameters:
+    use_sim_time: true
+    frame_id: chassis_link
+    odom_frame_id: odom
+    publish_tf: false
+    wait_for_transform: 0.2
+    approx_sync: true
+    queue_size: 10
+
+    Odom/Strategy: 0
+    Odom/ResetCountdown: 1
+    Odom/Holonomic: false
+    Vis/MinInliers: 15
+    Vis/InlierDistance: 0.1
+    Vis/MaxFeatures: 500
+    GFTT/MinDistance: 5.0
+    GFTT/QualityLevel: 0.001
