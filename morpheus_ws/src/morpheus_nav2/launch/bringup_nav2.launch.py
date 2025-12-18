@@ -95,6 +95,19 @@ def generate_launch_description():
     )
 
     # ---------------------------
+    # ArUco marker-based localization correction
+    # ---------------------------
+    aruco_map_cfg = os.path.join(pkg, 'config', 'aruco_marker_map.yaml')
+
+    aruco_localization = Node(
+        package='morpheus_nav2',
+        executable='aruco_localization.py',
+        name='aruco_localization',
+        output='screen',
+        parameters=[aruco_map_cfg, {'use_sim_time': use_sim_time}],
+    )
+
+    # ---------------------------
     # Point cloud ground segmentation
     # ---------------------------
     ground_seg = Node(
@@ -282,6 +295,9 @@ def generate_launch_description():
 
         # Visual odometry (feeds EKF as odom1)
         visual_odom,
+
+        # ArUco localization correction
+        aruco_localization,
 
         # Ground segmentation (feeds voxel_layer)
         ground_seg,

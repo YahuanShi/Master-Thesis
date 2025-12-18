@@ -10,6 +10,7 @@ install(DIRECTORY launch config
 install(PROGRAMS
   scripts/patrol_mission.py
   scripts/ground_segmentation.py
+  scripts/aruco_localization.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

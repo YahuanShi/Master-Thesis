@@ -1,0 +1,93 @@
+# Known ArUco marker poses in the map (world) frame.
+# Each entry maps a marker ID to its 6-DOF pose [x, y, z, roll, pitch, yaw].
+# The aruco_localization node uses these as ground-control points:
+# when a marker is detected, the node computes a map→odom correction
+# that aligns the observed marker pose with the ground-truth pose below.
+#
+# Coordinate convention:
+#   - Position: centre of the marker face, in the map frame.
+#   - Orientation: the marker's +Z axis points outward from the face
+#     (i.e. toward the camera that reads it).
+#
+# Marker IDs correspond to the DICT_5X5_50 dictionary.
+# aruco_box models carry IDs 1-6 on their six faces; aruco_marker_0 is ID 0.
+
+aruco_localization:
+  ros__parameters:
+    marker_map:
+      # aruco_marker_0 — flat panel facing -X (yaw = pi)
+      "0":
+        frame_id: map
+        x: 2.0
+        y: 3.5
+        z: 1.5
+        roll: 0.0
+        pitch: 0.0
+        yaw: 3.14159
+
+      # aruco_box instances — marker ID visible on the front face (+X)
+      # ar_box_1 at (-5, -5, 2.25)
+      "1":
+        frame_id: map
+        x: -5.0
+        y: -5.0
+        z: 2.25
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+
+      # ar_box_2 at (5, 5, 2.25)
+      "2":
+        frame_id: map
+        x: 5.0
+        y: 5.0
+        z: 2.25
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+
+      # ar_box_3 at (10, 10, 2.25)
+      "3":
+        frame_id: map
+        x: 10.0
+        y: 10.0
+        z: 2.25
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+
+      # ar_box_4 at (-10, 10, 2.25)
+      "4":
+        frame_id: map
+        x: -10.0
+        y: 10.0
+        z: 2.25
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+
+      # ar_box_5 at (-3, 3, 2.25)
+      "5":
+        frame_id: map
+        x: -3.0
+        y: 3.0
+        z: 2.25
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+
+      # ar_box_6 at (6, -6, 2.25)
+      "6":
+        frame_id: map
+        x: 6.0
+        y: -6.0
+        z: 2.25
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+
+    min_markers: 1
+    correction_weight: 0.3
+    max_correction_distance: 2.0
+    max_correction_angle: 0.5
+    publish_rate: 10.0
