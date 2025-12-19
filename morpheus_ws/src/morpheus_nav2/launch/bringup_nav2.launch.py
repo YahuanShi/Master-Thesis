@@ -189,12 +189,17 @@ def generate_launch_description():
         remappings=[('/cmd_vel', cmd_vel_topic)]
     )
 
+    bt_xml = os.path.join(pkg, 'behavior_trees', 'morpheus_nav_to_pose.xml')
+
     bt_nav = Node(
         package='nav2_bt_navigator',
         executable='bt_navigator',
         name='bt_navigator',
         output='screen',
-        parameters=[params_file, {'use_sim_time': use_sim_time}]
+        parameters=[params_file, {
+            'use_sim_time': use_sim_time,
+            'default_bt_xml_filename': bt_xml,
+        }]
     )
 
     waypoint_follower = Node(

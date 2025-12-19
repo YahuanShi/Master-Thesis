@@ -9,6 +9,12 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <!-- build + runtime deps for C++ BT plugins -->
+  <depend>rclcpp</depend>
+  <depend>behaviortree_cpp_v3</depend>
+  <depend>nav2_behavior_tree</depend>
+  <depend>ros2_aruco_interfaces</depend>
+
   <!-- runtime deps -->
   <exec_depend>nav2_bringup</exec_depend>
   <exec_depend>nav2_controller</exec_depend>
@@ -30,7 +36,6 @@
   <exec_depend>python3-opencv</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
   <exec_depend>rtabmap_odom</exec_depend>
-  <exec_depend>ros2_aruco_interfaces</exec_depend>
   <exec_depend>tf_transformations</exec_depend>
 
 

@@ -1,0 +1,76 @@
+<!--
+  Morpheus rover custom behavior tree for NavigateToPose.
+
+  Additions over the stock Nav2 tree:
+    1. ArUco marker detection — when a marker is spotted mid-navigation,
+       the rover pauses for 3 seconds (simulating a photograph) then resumes.
+    2. Escalating recovery — after consecutive failures the rover performs
+       progressively wider spins (90° → 180° → 360°) to scan the area,
+       then backs up and clears costmaps before retrying.
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode number_of_retries="6" name="NavigateRecovery">
+      <PipelineSequence name="NavigateWithReplanning">
+
+        <!-- Replan global path at 1 Hz -->
+        <RateController hz="1.0">
+          <RecoveryNode number_of_retries="1" name="ComputePathToPose">
+            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Context"
+              service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </RateController>
+
+        <!-- Follow the path, but check for ArUco markers reactively -->
+        <ReactiveFallback name="FollowOrPhoto">
+          <!-- Branch 1: ArUco detected → pause 3 s (photograph), then resume -->
+          <Sequence name="ArucoPhotoSequence">
+            <IsArucoDetected topic="/aruco_markers" timeout="1.0"/>
+            <Wait wait_duration="3"/>
+          </Sequence>
+          <!-- Branch 2: normal path following with local costmap recovery -->
+          <RecoveryNode number_of_retries="1" name="FollowPath">
+            <FollowPath path="{path}" controller_id="FollowPath"/>
+            <ClearEntireCostmap name="ClearLocalCostmap-Context"
+              service_name="local_costmap/clear_entirely_local_costmap"/>
+          </RecoveryNode>
+        </ReactiveFallback>
+
+      </PipelineSequence>
+
+      <!-- Escalating recovery: spin wider each round, then back up -->
+      <ReactiveFallback name="RecoveryFallback">
+        <GoalUpdated/>
+        <RoundRobin name="EscalatingRecovery">
+          <!-- Round 1: clear costmaps + small spin (90°) -->
+          <Sequence name="MildRecovery">
+            <ClearEntireCostmap name="ClearLocal-R1"
+              service_name="local_costmap/clear_entirely_local_costmap"/>
+            <ClearEntireCostmap name="ClearGlobal-R1"
+              service_name="global_costmap/clear_entirely_global_costmap"/>
+            <Spin spin_dist="1.57"/>
+          </Sequence>
+          <!-- Round 2: wider spin (180°) to scan surroundings -->
+          <Sequence name="MediumRecovery">
+            <ClearEntireCostmap name="ClearLocal-R2"
+              service_name="local_costmap/clear_entirely_local_costmap"/>
+            <Spin spin_dist="3.14"/>
+          </Sequence>
+          <!-- Round 3: full 360° scan + back up -->
+          <Sequence name="AggressiveRecovery">
+            <ClearEntireCostmap name="ClearLocal-R3"
+              service_name="local_costmap/clear_entirely_local_costmap"/>
+            <ClearEntireCostmap name="ClearGlobal-R3"
+              service_name="global_costmap/clear_entirely_global_costmap"/>
+            <Spin spin_dist="6.28"/>
+            <Wait wait_duration="2"/>
+            <BackUp backup_dist="0.30" backup_speed="0.05"/>
+          </Sequence>
+          <!-- Round 4: last resort — wait then retry -->
+          <Wait wait_duration="5"/>
+        </RoundRobin>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>
