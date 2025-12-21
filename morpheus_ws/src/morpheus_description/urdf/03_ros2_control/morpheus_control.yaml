@@ -21,6 +21,9 @@ controller_manager:
     gripper_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
+    morpheus_drive_controller:
+      type: morpheus_control/MorpheusDriveController
+
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
@@ -104,4 +107,27 @@ gripper_trajectory_controller:
     state_publish_rate: 50.0
     action_monitor_rate: 20.0
     allow_partial_joints_goal: false
+
+morpheus_drive_controller:
+  ros__parameters:
+    wheel_base: 1.072
+    wheel_radius: 0.125
+    wheel_separation: 0.615
+    wheel_steering_y_offset: 0.0
+    drive_gain: 10.0
+    deadzone: 0.05
+    steering_joints:
+      - steering_fl_joint
+      - steering_fr_joint
+      - steering_rl_joint
+      - steering_rr_joint
+    wheel_joints:
+      - wheel_fl_joint
+      - wheel_fr_joint
+      - wheel_rl_joint
+      - wheel_rr_joint
+    publish_odom: true
+    publish_odom_tf: false
+    odom_frame: odom
+    base_frame: chassis_link
 

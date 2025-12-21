@@ -1,0 +1,10 @@
+<library path="morpheus_drive_controller">
+  <class name="morpheus_control/MorpheusDriveController"
+         type="morpheus_control::MorpheusDriveController"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      Four-wheel independent steering controller for the Morpheus rover.
+      Supports Ackermann, pivot, and crab drive modes with wheel odometry output.
+    </description>
+  </class>
+</library>
