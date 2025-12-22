@@ -13,26 +13,64 @@ from launch.actions import (
 )
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.conditions import IfCondition
 from launch_ros.actions import Node
 
-gui = LaunchConfiguration('gui', default='true')
 
 def generate_launch_description():
 
     # ----------------------------
     # Launch Arguments
     # ----------------------------
-    use_sim_time = LaunchConfiguration('use_sim_time', default=True)
-    nav_mode = LaunchConfiguration('mode', default='localization')
+    world_arg      = LaunchConfiguration('world')
+    gui_arg        = LaunchConfiguration('gui')
+    use_sim_time   = LaunchConfiguration('use_sim_time')
+    nav_mode       = LaunchConfiguration('mode')
+    with_rviz      = LaunchConfiguration('with_rviz')
+    with_teleop    = LaunchConfiguration('with_teleop')
+
+    spawn_x   = LaunchConfiguration('spawn_x')
+    spawn_y   = LaunchConfiguration('spawn_y')
+    spawn_z   = LaunchConfiguration('spawn_z')
+    spawn_R   = LaunchConfiguration('spawn_R')
+    spawn_P   = LaunchConfiguration('spawn_P')
+    spawn_Y   = LaunchConfiguration('spawn_Y')
+
+    declare_args = [
+        DeclareLaunchArgument('world',        default_value='marsyard2022',
+                              description='GZ Sim world name (without .sdf)'),
+        DeclareLaunchArgument('gui',          default_value='true',
+                              description='Start Gazebo GUI'),
+        DeclareLaunchArgument('use_sim_time', default_value='true',
+                              description='Use Gazebo clock'),
+        DeclareLaunchArgument('mode',         default_value='localization',
+                              description="Nav2: 'localization' (AMCL) or 'mapping' (slam_toolbox)"),
+        DeclareLaunchArgument('with_rviz',    default_value='false',
+                              description='Launch RViz2'),
+        DeclareLaunchArgument('with_teleop',  default_value='true',
+                              description='Launch teleop_twist_joy + twist_mux'),
+        DeclareLaunchArgument('spawn_x',      default_value='0.0',
+                              description='Rover spawn X position'),
+        DeclareLaunchArgument('spawn_y',      default_value='4.0',
+                              description='Rover spawn Y position'),
+        DeclareLaunchArgument('spawn_z',      default_value='1.5',
+                              description='Rover spawn Z position'),
+        DeclareLaunchArgument('spawn_R',      default_value='0.0',
+                              description='Rover spawn roll'),
+        DeclareLaunchArgument('spawn_P',      default_value='0.0',
+                              description='Rover spawn pitch'),
+        DeclareLaunchArgument('spawn_Y',      default_value='0.0',
+                              description='Rover spawn yaw'),
+    ]
 
     # ----------------------------
     # Package Paths
     # ----------------------------
-    morpheus_control_path = get_package_share_directory('morpheus_control')
+    morpheus_control_path     = get_package_share_directory('morpheus_control')
     morpheus_description_path = get_package_share_directory('morpheus_description')
-    morpheus_simulation_path = get_package_share_directory('morpheus_simulation')
-    morpheus_nav2_path = get_package_share_directory('morpheus_nav2')
+    morpheus_simulation_path  = get_package_share_directory('morpheus_simulation')
+    morpheus_nav2_path        = get_package_share_directory('morpheus_nav2')
 
     # ----------------------------
     # Gazebo: resources + launcher
@@ -49,22 +87,13 @@ def generate_launch_description():
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([gz_pkg_path, '/gz_sim.launch.py']),
         launch_arguments={
-            'gz_args': [LaunchConfiguration('world'), '.sdf', ' -v 1', ' -r'],
-            'gui': gui
+            'gz_args': [world_arg, '.sdf', ' -v 1', ' -r'],
+            'gui': gui_arg,
         }.items(),
     )
 
-    arguments = LaunchDescription([
-        DeclareLaunchArgument('world', default_value='marsyard2022', description='GZ Sim world'),
-        DeclareLaunchArgument('gui', default_value='true', description='Start Gazebo GUI'),
-        DeclareLaunchArgument('use_sim_time', default_value='true', description='Use Gazebo clock'),
-        DeclareLaunchArgument('mode', default_value='localization',
-                              description="Nav2 mode: 'localization' (AMCL) or 'mapping' (slam_toolbox)"),
-    ])
-
     # ----------------------------
     # (Optional) ArUco recognition (uses zed_2i)
-    # - 用 try/except 防止未安装时阻塞启动
     # ----------------------------
     aruco_node = None
     try:
@@ -80,19 +109,8 @@ def generate_launch_description():
             parameters=[
                 aruco_params,
                 {'image_topic': '/camera_2i'},
-                # gz-sensors' CameraSensor defaults to publishing CameraInfo on
-                # a single shared "/camera_info" topic, which collides between
-                # zed_2i and zed_mini (aruco_node latches the first CameraInfo
-                # it sees and never re-subscribes — it could silently lock onto
-                # zed_mini's intrinsics). gazebo.xacro now sets an explicit,
-                # unique <camera_info_topic> per camera; this must match
-                # zed_2i's value there, and bridge_camera_2i_info below.
                 {'camera_info_topic': '/camera_2i/camera_info'},
                 {'camera_frame': 'zed_2i_link'},
-                # aruco_parameters.yaml is loaded under /aruco_node but this
-                # node is renamed to aruco_detector_2i, so the yaml values
-                # are silently ignored — override the two detection-critical
-                # params here to match the aruco_box models in the world.
                 {'marker_size': 0.1},
                 {'aruco_dictionary_id': 'DICT_5X5_50'},
                 {'use_sim_time': use_sim_time},
@@ -100,7 +118,6 @@ def generate_launch_description():
             output='screen',
         )
     except Exception:
-        # 未安装 ros2_aruco 时跳过
         aruco_node = None
 
     # ----------------------------
@@ -118,7 +135,6 @@ def generate_launch_description():
             {'robot_description': robot_desc},
             {'use_sim_time': use_sim_time},
         ],
-        # NOTE: do NOT remap /tf or /tf_static or Nav2/AMCL won't see TFs
     )
 
     gz_spawn_entity = Node(
@@ -126,18 +142,16 @@ def generate_launch_description():
         executable='create',
         output='screen',
         arguments=[
-            '-string',
-            robot_desc,
-            '-x', '0.0',
-            '-y', '4.0',
-            '-z', '1.5',
-            '-R', '0.0',
-            '-P', '0.0',
-            '-Y', '0.0',
+            '-string', robot_desc,
+            '-x', spawn_x,
+            '-y', spawn_y,
+            '-z', spawn_z,
+            '-R', spawn_R,
+            '-P', spawn_P,
+            '-Y', spawn_Y,
         ],
     )
-    
-    # base_link 别名（如外部包用 base_link）
+
     static_base_alias = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -149,14 +163,13 @@ def generate_launch_description():
     # ----------------------------
     # Controllers via spawner
     # ----------------------------
-    # 注意：如果你在 morpheus_control.launch.py 里也会加载控制器，请确保不要重复加载
     controller = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(morpheus_control_path, 'launch', 'morpheus_control.launch.py')
         ),
     )
 
-    CONTROLLER_MGR = '/controller_manager'  # gz_ros2_control 默认名
+    CONTROLLER_MGR = '/controller_manager'
 
     spawner_jsb = Node(
         package='controller_manager',
@@ -197,8 +210,7 @@ def generate_launch_description():
         arguments=['robotic_arm_controller', '--controller-manager', CONTROLLER_MGR],
         output='screen'
     )
-    
-    # 顺序：spawn 完成 → 1s 后 JSB → JSB 成功后并行加载其它
+
     activate_jsb_after_spawn = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=gz_spawn_entity,
@@ -214,11 +226,8 @@ def generate_launch_description():
     )
 
     # ----------------------------
-    # ROS ⇄ Gazebo bridges
+    # ROS-Gazebo bridges
     # ----------------------------
-    # Sim clock — required by every node running with use_sim_time=true
-    # (controllers, Nav2, EKF, robot_state_publisher, …); without this bridge
-    # /clock has no publisher and all of their timers/TF stay frozen.
     bridge_clock = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -227,7 +236,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Lidar scan
     bridge_scan = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -236,7 +244,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Lidar points
     bridge_cloud = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -245,7 +252,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Main camera (zed_2i)
     bridge_camera_2i = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -254,11 +260,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Main camera info (zed_2i) — gazebo.xacro now sets an explicit
-    # <camera_info_topic>/camera_2i/camera_info</camera_info_topic> on the
-    # zed_2i sensor so its CameraInfo no longer collides with zed_mini's on
-    # gz-sensors' shared default "/camera_info" topic (see aruco_node's
-    # camera_info_topic comment above for why that collision matters).
     bridge_camera_2i_info = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -267,7 +268,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Depth image from zed_2i (rgbd_camera sensor)
     bridge_depth_2i = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -276,7 +276,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Depth point cloud from zed_2i
     bridge_depth_cloud_2i = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -285,7 +284,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Mini camera (Robotic arm)
     bridge_camera_mini = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -294,16 +292,25 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Gazebo odometry
+    # Odom bridge — world name is parameterized; republish to /gz/odom
+    # so EKF config doesn't need to know the world name
+    odom_bridge_arg = PythonExpression([
+        "'/world/' + '", world_arg,
+        "' + '/model/morpheus_rover/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry'"
+    ])
+    odom_remap_src = PythonExpression([
+        "'/world/' + '", world_arg,
+        "' + '/model/morpheus_rover/odometry'"
+    ])
     bridge_odom = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         name='bridge_odom',
-        arguments=['/world/marsyard2022/model/morpheus_rover/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry'],
+        arguments=[odom_bridge_arg],
+        remappings=[(odom_remap_src, '/gz/odom')],
         output='screen',
     )
 
-    # IMU
     bridge_imu = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -311,9 +318,9 @@ def generate_launch_description():
         arguments=['/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
         output='screen',
     )
-    
+
     # ----------------------------
-    # EKF（publish odom->base_link）
+    # EKF (publish odom->base_link)
     # ----------------------------
     ekf_node = Node(
         package='robot_localization',
@@ -322,22 +329,25 @@ def generate_launch_description():
         output='screen',
         parameters=[os.path.join(morpheus_nav2_path, 'config', 'ekf.yaml'),
                     {'use_sim_time': use_sim_time}],
+        remappings=[
+            ('odometry/filtered', '/odometry/filtered'),
+        ],
     )
-    
+
     # ----------------------------
     # Nav2 Bringup
     # ----------------------------
-    nav2_bringup_launch  = IncludeLaunchDescription(
+    nav2_bringup_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(morpheus_nav2_path, 'launch', 'bringup_nav2.launch.py')
         ),
         launch_arguments={
-            'use_sim_time': 'true',
-            'with_teleop': 'true',
+            'use_sim_time': use_sim_time,
+            'with_teleop': with_teleop,
             'mode': nav_mode,
         }.items(),
     )
-    activate_nav2 = TimerAction(period=2.0, actions=[nav2_bringup_launch ])
+    activate_nav2 = TimerAction(period=2.0, actions=[nav2_bringup_launch])
 
     # ----------------------------
     # RViz (optional)
@@ -350,27 +360,26 @@ def generate_launch_description():
         output='log',
         arguments=['-d', rviz_config_file],
         parameters=[{'use_sim_time': use_sim_time}],
+        condition=IfCondition(with_rviz),
     )
 
     # ----------------------------
     # LaunchDescription
     # ----------------------------
     ld_items = [
+        *declare_args,
         gazebo_resource_path,
-        arguments,
         gazebo,
-        
+
         node_robot_state_publisher,
         static_base_alias,
         gz_spawn_entity,
 
-        # 控制器：事件式顺序
         activate_jsb_after_spawn,
         activate_rest_after_jsb,
 
-        controller,          # 注意避免在这个 include 内部重复加载控制器
+        controller,
 
-        # Bridges & sensors
         bridge_clock,
         bridge_camera_2i,
         bridge_camera_2i_info,
@@ -384,14 +393,10 @@ def generate_launch_description():
         ekf_node,
         activate_nav2,
 
-        # 可选
-        # bridge_camera_mini,
-        # rviz,
+        rviz,
     ]
 
     if aruco_node is not None:
         ld_items.append(aruco_node)
-        # ld_items.append(bridge_camera_mini)   # 如需 Mini camera 桥接也取消注释
-        # ld_items.append(rviz)          # 如需 RViz 也取消注释
 
     return LaunchDescription(ld_items)
