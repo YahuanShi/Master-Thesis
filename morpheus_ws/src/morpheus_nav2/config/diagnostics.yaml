@@ -1,0 +1,40 @@
+diagnostic_aggregator:
+  ros__parameters:
+    analyzers:
+      sensors:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Sensors
+        contains:
+          - "imu"
+          - "lidar"
+          - "camera"
+          - "scan"
+      localization:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Localization
+        contains:
+          - "ekf"
+          - "amcl"
+          - "slam"
+          - "odom"
+          - "aruco"
+      navigation:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Navigation
+        contains:
+          - "controller"
+          - "planner"
+          - "bt_navigator"
+          - "behavior"
+          - "costmap"
+          - "waypoint"
+      controllers:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Controllers
+        contains:
+          - "joint_state"
+          - "velocity_controller"
+          - "position_controller"
+          - "arm"
+          - "gripper"
+          - "drive_controller"

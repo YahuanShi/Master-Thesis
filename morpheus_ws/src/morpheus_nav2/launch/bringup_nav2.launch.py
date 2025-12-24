@@ -108,6 +108,19 @@ def generate_launch_description():
     )
 
     # ---------------------------
+    # Diagnostic aggregator
+    # ---------------------------
+    diag_cfg = os.path.join(pkg, 'config', 'diagnostics.yaml')
+
+    diagnostic_aggregator = Node(
+        package='diagnostic_aggregator',
+        executable='aggregator_node',
+        name='diagnostic_aggregator',
+        output='screen',
+        parameters=[diag_cfg, {'use_sim_time': use_sim_time}],
+    )
+
+    # ---------------------------
     # Point cloud ground segmentation
     # ---------------------------
     ground_seg = Node(
@@ -303,6 +316,9 @@ def generate_launch_description():
 
         # ArUco localization correction
         aruco_localization,
+
+        # Diagnostics
+        diagnostic_aggregator,
 
         # Ground segmentation (feeds voxel_layer)
         ground_seg,
