@@ -102,19 +102,24 @@ The project includes tests for:
 - Link and joint consistency
 - Launch-level controller behavior
 
+## Architecture
+
+See [docs/architecture.md](docs/architecture.md) for the full ROS node topology, TF tree, and data flow diagrams.
+
 ## Repository Layout
 
 ```text
 Morpheus/
 ├── docker/                     # Reproducible ROS 2 / Gazebo environment
+├── docs/                       # Architecture diagrams and documentation
 ├── MarsYard2024/               # Mars Yard mesh, texture, and USD assets
-├── morpheus_isaac.usd          # Isaac Sim scene variant
 ├── run_morpheus_all.sh         # Full-stack launcher
 └── morpheus_ws/src/
     ├── morpheus_description/   # URDF/xacro robot model and meshes
     ├── morpheus_simulation/    # Gazebo worlds, spawning, bridges
-    ├── morpheus_control/       # Rover kinematics and joystick/base control
-    ├── morpheus_nav2/          # Nav2, SLAM, maps, missions, perception helpers
+    ├── morpheus_control/       # Rover kinematics and ros2_control drive controller
+    ├── morpheus_nav2/          # Nav2, SLAM, perception, missions, behavior trees
+    ├── morpheus_moveit_config/ # MoveIt2 arm planning configuration
     └── ros2_aruco/             # ArUco marker detection package
 ```
 
