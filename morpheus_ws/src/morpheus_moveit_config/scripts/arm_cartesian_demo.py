@@ -11,19 +11,18 @@ Usage (after launching moveit.launch.py):
 """
 
 import rclpy
-from rclpy.action import ActionClient
-from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
 from moveit_msgs.action import MoveGroup
 from moveit_msgs.msg import (
+    BoundingVolume,
     Constraints,
     MotionPlanRequest,
+    OrientationConstraint,
     PlanningOptions,
     PositionConstraint,
-    OrientationConstraint,
-    BoundingVolume,
-    RobotState,
 )
+from rclpy.action import ActionClient
+from rclpy.node import Node
 from shape_msgs.msg import SolidPrimitive
 
 

@@ -1,15 +1,13 @@
 #!/usr/bin/python3
 import threading
 
-from geometry_msgs.msg import Twist
 import numpy as np
-
 import rclpy
+from geometry_msgs.msg import Twist
+from kinematics import ChassisParams, compute_drive
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
 from std_msgs.msg import Float64MultiArray
-
-from kinematics import ChassisParams, compute_drive
 
 # Lock-protected shared state between Joy_subscriber and Robot_control.
 # Joy_subscriber writes; Robot_control reads inside its timer callback.
@@ -31,9 +29,12 @@ class Robot_control(Node):
 
         self.base_cmd = Twist()
 
-        self.pub_pos = self.create_publisher(Float64MultiArray, '/forward_position_controller/commands', 10)
-        self.pub_vel = self.create_publisher(Float64MultiArray, '/forward_velocity_controller/commands', 10)
-        self.pub_ra_pos = self.create_publisher(Float64MultiArray, '/robotic_arm_controller/commands', 10)
+        self.pub_pos = self.create_publisher(
+            Float64MultiArray, '/forward_position_controller/commands', 10)
+        self.pub_vel = self.create_publisher(
+            Float64MultiArray, '/forward_velocity_controller/commands', 10)
+        self.pub_ra_pos = self.create_publisher(
+            Float64MultiArray, '/robotic_arm_controller/commands', 10)
 
         self.sub_cmd_vel = self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_cb, 10)
 
@@ -114,30 +115,28 @@ class Robot_control(Node):
                     else:
                         self.ra_pos[4] = command
 
-        elif mode_selection == 10:
-            if int(joy_az) != 0:
-                command = self.ra_pos[5] - joy_az * 0.005
-                if abs(command) < 1.5:
+        elif mode_selection == 10 and int(joy_az) != 0:
+            command = self.ra_pos[5] - joy_az * 0.005
+            if abs(command) < 1.5:
+                self.ra_pos[5] = command
+            else:
+                if np.sign(joy_az)*np.sign(self.ra_pos[5]) < 0:
+                    self.ra_pos[5] = np.sign(self.ra_pos[5]) * 1.5
+                else:
                     self.ra_pos[5] = command
-                else:
-                    if np.sign(joy_az)*np.sign(self.ra_pos[5]) < 0:
-                        self.ra_pos[5] = np.sign(self.ra_pos[5]) * 1.5
-                    else:
-                        self.ra_pos[5] = command
 
-        if mode_selection == 11:
-            if round(joy_az, 3) != 0:
-                command = self.ra_pos[6] - joy_az * 0.005
-                if command >= 0.0:
-                    if abs(command) < 0.29:
-                        self.ra_pos[6] = command
-                    else:
-                        if np.sign(joy_az)*np.sign(self.ra_pos[6]) < 0:
-                            self.ra_pos[6] = np.sign(self.ra_pos[6]) * 0.29
-                        else:
-                            self.ra_pos[6] = command
+        if mode_selection == 11 and round(joy_az, 3) != 0:
+            command = self.ra_pos[6] - joy_az * 0.005
+            if command >= 0.0:
+                if abs(command) < 0.29:
+                    self.ra_pos[6] = command
                 else:
-                    self.ra_pos[6] = 0.0
+                    if np.sign(joy_az)*np.sign(self.ra_pos[6]) < 0:
+                        self.ra_pos[6] = np.sign(self.ra_pos[6]) * 0.29
+                    else:
+                        self.ra_pos[6] = command
+            else:
+                self.ra_pos[6] = 0.0
 
         self.pub_pos.publish(Float64MultiArray(data=self.pos))
         self.pub_vel.publish(Float64MultiArray(data=self.vel))
@@ -175,8 +174,8 @@ class Joy_subscriber(Node):
             mode = 4
 
         axes = Twist()
-        axes.linear.x  = data.axes[1]
-        axes.linear.y  = data.axes[0]
+        axes.linear.x = data.axes[1]
+        axes.linear.y = data.axes[0]
         axes.angular.z = data.axes[3]
         axes.angular.y = data.axes[4]
 

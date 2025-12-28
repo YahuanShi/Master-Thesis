@@ -5,7 +5,6 @@ import xml.etree.ElementTree as ET
 import pytest
 from ament_index_python.packages import get_package_share_directory
 
-
 PKG = 'morpheus_description'
 
 
@@ -42,22 +41,22 @@ class TestUrdfParsing:
 
     def test_chassis_link_exists(self, urdf_xml):
         root = ET.fromstring(urdf_xml)
-        names = [l.attrib.get('name') for l in root.findall('.//link')]
+        names = [link.attrib.get('name') for link in root.findall('.//link')]
         assert 'chassis_link' in names
 
     def test_no_duplicate_link_names(self, urdf_xml):
         root = ET.fromstring(urdf_xml)
-        names = [l.attrib['name'] for l in root.findall('.//link')]
+        names = [link.attrib['name'] for link in root.findall('.//link')]
         assert len(names) == len(set(names)), f'Duplicate links: {names}'
 
     def test_no_duplicate_joint_names(self, urdf_xml):
         root = ET.fromstring(urdf_xml)
-        names = [j.attrib['name'] for j in root.findall('.//joint')]
+        names = [j.attrib['name'] for j in root.findall('./joint')]
         assert len(names) == len(set(names)), f'Duplicate joints: {names}'
 
     def test_all_joints_reference_existing_links(self, urdf_xml):
         root = ET.fromstring(urdf_xml)
-        link_names = {l.attrib['name'] for l in root.findall('.//link')}
+        link_names = {link.attrib['name'] for link in root.findall('.//link')}
         for joint in root.findall('.//joint'):
             parent = joint.find('parent')
             child = joint.find('child')
@@ -70,7 +69,6 @@ class TestUrdfParsing:
 
     def test_has_ros2_control_tag(self, urdf_xml):
         root = ET.fromstring(urdf_xml)
-        ns = {'ros2': 'http://ros.org/wiki/ros2_control'}
         r2c = root.findall('.//ros2_control')
         if not r2c:
             r2c = root.findall('.//{http://ros.org/wiki/ros2_control}ros2_control')

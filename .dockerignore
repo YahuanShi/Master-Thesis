@@ -1,0 +1,7 @@
+.git
+morpheus_ws/build
+morpheus_ws/install
+morpheus_ws/log
+__pycache__
+*.pyc
+.github

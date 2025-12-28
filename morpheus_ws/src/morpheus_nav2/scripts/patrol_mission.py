@@ -2,14 +2,14 @@
 """Patrol mission — sequentially navigate to waypoints, checking for ArUco markers at each stop."""
 
 import time
-import yaml
 
 import rclpy
-from rclpy.qos import QoSProfile, ReliabilityPolicy
+import yaml
+from ament_index_python.packages import get_package_share_directory
 from geometry_msgs.msg import PoseStamped
 from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 from tf_transformations import quaternion_from_euler
-from ament_index_python.packages import get_package_share_directory
 
 try:
     from ros2_aruco_interfaces.msg import ArucoMarkers

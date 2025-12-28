@@ -22,10 +22,7 @@ class ChassisParams:
 def compute_drive(
     vx: float, vy: float, wz: float, params: ChassisParams
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Compute steering positions and wheel velocities from cmd_vel.
-
-    Returns (pos[4], vel[4]) where indices are [FL, FR, RL, RR].
-    """
+    """Compute steering positions and wheel velocities from cmd_vel."""
     pos = np.zeros(4)
     vel = np.zeros(4)
 
@@ -74,12 +71,12 @@ def _ackermann(
 
     vel[0] = (
         sign * math.hypot(vx - wz * p.steering_track / 2.0,
-                           wz * p.wheel_base / 2.0)
+                          wz * p.wheel_base / 2.0)
         - vel_steering_offset
     )
     vel[1] = (
         sign * math.hypot(vx + wz * p.steering_track / 2.0,
-                           wz * p.wheel_base / 2.0)
+                          wz * p.wheel_base / 2.0)
         + vel_steering_offset
     )
     vel[2] = vel[0]

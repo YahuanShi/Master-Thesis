@@ -72,7 +72,8 @@ if(BUILD_TESTING)
   ament_add_pytest_test(test_kinematics test/test_kinematics.py)
 
   find_package(launch_testing_ament_cmake REQUIRED)
-  add_launch_test(test/test_control_node.py)
+  add_launch_test(test/test_control_node.py
+    TIMEOUT 120)
 endif()
 
 ament_export_libraries(morpheus_drive_controller)

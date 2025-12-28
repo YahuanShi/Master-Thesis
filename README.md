@@ -1,200 +1,177 @@
 # Morpheus
 
-Morpheus is a simulated planetary rover built with **ROS 2 Humble**, **Gazebo / GZ Sim**, **Nav2**, `ros2_control`, and a custom Mars Yard environment.
+A simulated Mars rover built with **ROS 2 Humble** and **Gazebo**, featuring four-wheel independent steering, a 7-DOF robotic arm, autonomous navigation, SLAM, sensor fusion, perception, and mission-level autonomy.
 
-The project is a robotics learning and systems-integration showcase: it brings together robot modeling, simulation, rover kinematics, autonomous navigation, SLAM, perception, sensor fusion, manipulation, and mission-level autonomy in one ROS 2 workspace.
+<!-- TODO: Add demo GIF/video here -->
+<!-- ![Morpheus Demo](docs/demo.gif) -->
 
-## What It Does
+## Highlights
 
-Morpheus simulates a Mars rover that can drive, localize, map, navigate through rough terrain, detect visual markers, follow patrol missions, and control a robotic arm.
-
-The stack includes:
-
-- A four-wheel independently steered rover chassis
-- A 7-DOF robotic arm with gripper/drill tooling
-- A custom Mars Yard Gazebo world with terrain, obstacles, and ArUco targets
-- LiDAR, stereo cameras, IMU, odometry, and point cloud processing
-- Nav2 autonomous navigation with localization, planning, control, recovery, and waypoint following
-- Online SLAM for unknown-environment mapping
-- EKF-based sensor fusion
-- 3D costmaps using segmented point clouds
-- Joystick teleoperation for both the rover base and arm
-- ArUco marker detection and marker-based mission behaviors
-- MoveIt2-style arm planning and Cartesian end-effector control
-- Visual odometry / visual SLAM integration as an additional localization source
-- Custom Nav2 behavior-tree logic for task-aware autonomy
-- Diagnostics, monitoring, RViz visualization, and test coverage
-
-## Why I Built It
-
-Morpheus is a project for practicing the core skills needed to build mobile robot software:
-
-- Modeling a robot in URDF/xacro
-- Connecting Gazebo simulation with ROS 2 topics, TF, sensors, and controllers
-- Implementing rover kinematics for Ackermann steering, pivot turns, and crab walking
-- Using `ros2_control` for joint-level command interfaces
-- Building a Nav2 navigation stack from map, localization, planner, controller, costmaps, and lifecycle nodes
-- Using SLAM, visual odometry, IMU, and wheel/ground-truth odometry for state estimation
-- Processing 2D and 3D perception data for obstacle avoidance
-- Designing autonomous waypoint missions with perception-triggered behaviors
-- Structuring a multi-package ROS 2 workspace with launch files, configs, tests, and Docker support
-
-## Main Features
-
-### Rover Simulation
-
-The rover runs in Gazebo on a Mars Yard terrain model. The simulation includes the robot model, physics, sensors, controller interfaces, ROS-Gazebo bridges, and RViz visualization.
-
-### Chassis Control
-
-The base controller converts `/cmd_vel` into steering angles and wheel velocities for a four-wheel independently steered rover.
-
-Supported drive modes include:
-
-- Straight driving
-- Ackermann-style turning
-- In-place pivot turns
-- Crab walking
-
-### Navigation and Mapping
-
-Morpheus uses Nav2 for autonomous navigation. It supports both map-based localization and online mapping:
-
-- AMCL localization on a prebuilt occupancy map
-- `slam_toolbox` online SLAM
-- Nav2 planner, controller, smoother, behavior server, and BT navigator
-- Waypoint following and patrol missions
-- Static, 2D LiDAR, and 3D point-cloud costmap sources
-
-### Perception
-
-The simulated sensor stack includes:
-
-- LiDAR scan and point cloud
-- Stereo camera streams
-- IMU
-- Gazebo odometry
-- ArUco marker detection
-- Ground/obstacle point cloud segmentation
-- Visual odometry / visual SLAM input for localization
-
-### Sensor Fusion
-
-State estimation is handled through an EKF that combines odometry, IMU, and visual localization sources into a consistent TF tree for Nav2.
-
-### Mission Autonomy
-
-The patrol mission system loads waypoints from YAML, sends goals to Nav2, waits at each target, checks for ArUco markers, and continues or recovers based on task state.
-
-Custom behavior-tree logic adds task-aware autonomy such as stopping for marker inspection, retrying failed goals, and scanning when navigation fails.
-
-### Manipulation
-
-The rover includes a 7-DOF arm with joint-level teleoperation and motion-planning support for Cartesian end-effector goals, inverse kinematics, and obstacle-aware planning.
-
-### Testing
-
-The project includes tests for:
-
-- Rover kinematics
-- Control-node command output
-- URDF/xacro validity
-- Link and joint consistency
-- Launch-level controller behavior
+- **Four-wheel independent steering** with Ackermann, pivot turn, and crab walk drive modes
+- **Custom `ros2_control` controller** (C++) with real-time wheel odometry publishing
+- **Nav2 autonomous navigation** with costmap, planner, controller, and recovery behaviors
+- **Online SLAM** via patched `slam_toolbox` (custom TF fix for Gazebo single-threaded executor)
+- **EKF sensor fusion** combining wheel odometry, IMU, visual odometry, and ArUco corrections
+- **3D perception pipeline** with LiDAR point cloud ground segmentation feeding voxel costmaps
+- **ArUco marker detection** driving localization correction and mission-aware behavior tree logic
+- **7-DOF arm** with MoveIt2 planning, Cartesian control, and joystick teleoperation
+- **Patrol mission system** with YAML waypoints, Nav2 goal tracking, and marker-triggered actions
+- **Custom Mars Yard** environment modeled in Blender with realistic terrain and obstacles
+- **CI pipeline** with GitHub Actions, Docker builds, and automated testing
+- **57+ unit and integration tests** across kinematics, perception, URDF validation, BT plugins, and launch tests
 
 ## Architecture
 
-See [docs/architecture.md](docs/architecture.md) for the full ROS node topology, TF tree, and data flow diagrams.
+```
+                    ┌─────────────┐
+                    │  Joystick   │
+                    └──────┬──────┘
+                           │ /joy
+                    ┌──────▼──────┐         ┌──────────────┐
+                    │  Teleop /   │ cmd_vel │  Nav2 Stack  │
+                    │  Twist Mux  │◄────────│  (planner,   │
+                    └──────┬──────┘         │  controller, │
+                           │                │  BT, recovs) │
+                    ┌──────▼──────┐         └──────▲───────┘
+                    │ Drive Ctrl  │                │
+                    │ (ros2_ctrl) │         ┌──────┴───────┐
+                    └──────┬──────┘         │  Costmaps    │
+                           │                │  (2D + 3D)   │
+                    ┌──────▼──────┐         └──────▲───────┘
+                    │   Gazebo    │                │
+                    │  Sim + HW   │──sensors──►  Perception
+                    └─────────────┘           (LiDAR, cam,
+                                              ground seg,
+                                              ArUco, EKF)
+```
 
-## Repository Layout
+Full node topology, TF tree, and data flow in [docs/architecture.md](docs/architecture.md).
 
-```text
+## Repository Structure
+
+```
 Morpheus/
-├── docker/                     # Reproducible ROS 2 / Gazebo environment
-├── docs/                       # Architecture diagrams and documentation
-├── MarsYard2024/               # Mars Yard mesh, texture, and USD assets
-├── run_morpheus_all.sh         # Full-stack launcher
+├── docker/                         Dockerfile, compose, GPU passthrough
+├── docs/                           Architecture diagrams
+├── MarsYard2024/                   Mars Yard mesh/texture/USD assets
+├── .github/workflows/ci.yml       CI: build + test in Docker
+├── run_morpheus_all.sh             One-command full-stack launcher
 └── morpheus_ws/src/
-    ├── morpheus_description/   # URDF/xacro robot model and meshes
-    ├── morpheus_simulation/    # Gazebo worlds, spawning, bridges
-    ├── morpheus_control/       # Rover kinematics and ros2_control drive controller
-    ├── morpheus_nav2/          # Nav2, SLAM, perception, missions, behavior trees
-    ├── morpheus_moveit_config/ # MoveIt2 arm planning configuration
-    └── ros2_aruco/             # ArUco marker detection package
+    ├── morpheus_description/       URDF/xacro model, meshes, sensor macros
+    ├── morpheus_simulation/        Gazebo worlds, spawning, ROS-GZ bridges
+    ├── morpheus_control/           Kinematics, ros2_control drive controller
+    ├── morpheus_nav2/              Nav2, SLAM, EKF, perception, missions, BTs
+    ├── morpheus_moveit_config/     MoveIt2 arm planning + Cartesian demo
+    └── ros2_aruco/                 ArUco marker detection (vendored)
 ```
 
 ## Quick Start
 
-The recommended way to run the project is with Docker.
+### Prerequisites
+
+- Docker with NVIDIA Container Toolkit (for GPU-accelerated Gazebo rendering)
+- A joystick/gamepad (optional, for teleoperation)
+
+### Build and Run
 
 ```bash
-./docker/run.sh
-```
+# Build the Docker image
+cd docker && docker compose build
 
-Inside the container:
+# Start the container (GPU, X11, joystick passthrough)
+docker compose up -d
+docker compose exec morpheus bash
 
-```bash
+# Inside the container
 cd /workspace/Morpheus/morpheus_ws
 colcon build --symlink-install
 source install/setup.bash
 
+# Launch the full stack
 cd /workspace/Morpheus
 ./run_morpheus_all.sh
 ```
 
-Run with online SLAM:
+### Launch Modes
 
 ```bash
+# Default: map-based localization
+./run_morpheus_all.sh
+
+# Online SLAM for unknown environments
 ./run_morpheus_all.sh mode:=mapping
-```
 
-Run with map-based localization:
-
-```bash
+# Explicit localization mode
 ./run_morpheus_all.sh mode:=localization
 ```
 
-## Useful Commands
-
-Launch the full stack:
-
-```bash
-./run_morpheus_all.sh
-```
-
-Launch Nav2 directly:
-
-```bash
-ros2 launch morpheus_nav2 bringup_nav2.launch.py mode:=localization
-```
-
-Run the patrol mission:
+### Run a Patrol Mission
 
 ```bash
 ros2 run morpheus_nav2 patrol_mission.py
 ```
 
-Run tests:
+### Run Tests
 
 ```bash
 cd morpheus_ws
-colcon test --packages-select morpheus_control morpheus_description
+colcon test --packages-select morpheus_control morpheus_description morpheus_nav2
 colcon test-result --verbose
 ```
 
+## Package Details
+
+### morpheus_description
+
+URDF/xacro robot model with parameterized sensor macros (LiDAR, stereo cameras, IMU), collision meshes, and `ros2_control` hardware interface declarations.
+
+### morpheus_control
+
+- Python kinematics library supporting Ackermann, pivot, and crab drive modes
+- C++ `ros2_control` controller plugin with real-time command/state interfaces and wheel odometry
+- Joystick-driven teleoperation for both the rover chassis and robotic arm
+- Dynamic parameter reconfiguration for drive gain, deadzone, and wheel geometry
+
+### morpheus_nav2
+
+- Nav2 navigation stack with AMCL localization and `slam_toolbox` online SLAM
+- EKF sensor fusion (`robot_localization`) combining wheel/visual odometry + IMU
+- 3D LiDAR point cloud ground segmentation for voxel costmap obstacle detection
+- ArUco marker-based localization correction with weighted pose averaging
+- Custom behavior tree condition plugin (`IsArucoDetected`) for marker-aware autonomy
+- Waypoint patrol mission manager with YAML-configurable routes
+- DEM-to-occupancy-grid map generation for terrain-based planning
+
+### morpheus_moveit_config
+
+MoveIt2 configuration for the 7-DOF arm with SRDF, kinematics solver, planning pipeline, and a Cartesian end-effector control demo script.
+
+### morpheus_simulation
+
+Gazebo world definitions, robot spawning, and ROS-GZ bridge configuration for all sensor topics. Includes a custom Mars Yard world built from Blender-exported terrain.
+
+## Docker
+
+The project includes a complete Docker setup for reproducible builds:
+
+- **Dockerfile**: Based on `osrf/ros:humble-desktop-full`, installs the full ROS 2 navigation/control/simulation stack, and builds a patched `slam_toolbox` from source
+- **docker-compose.yml**: GPU passthrough, X11 forwarding, joystick device, and host network mode
+- **CI**: GitHub Actions runs build + test in the same ROS 2 container image
+
+The `slam_toolbox` patch fixes a TF lookup deadlock specific to Gazebo's single-threaded executor — the stock `getOdomPose()` uses exact-timestamp lookups with zero timeout, which silently fails when the TF buffer can't update during the scan callback.
+
 ## Tech Stack
 
-- ROS 2 Humble
-- Gazebo / GZ Sim
-- Nav2
-- `ros2_control`
-- `slam_toolbox`
-- `robot_localization`
-- MoveIt2
-- RViz
-- Python / rclpy
-- URDF / xacro
-- Docker
+| Layer | Tools |
+|-------|-------|
+| Simulation | Gazebo (Ignition), ROS-GZ bridges |
+| Robot Model | URDF, xacro, SDF |
+| Control | ros2_control, ros2_controllers, custom C++ controller plugin |
+| Navigation | Nav2, AMCL, slam_toolbox, robot_localization (EKF) |
+| Perception | PCL ground segmentation, ArUco detection, visual odometry |
+| Manipulation | MoveIt2, MoveIt Servo |
+| Visualization | RViz2, diagnostic_aggregator |
+| Infrastructure | Docker, GitHub Actions CI, colcon, pytest, gtest |
 
 ## License
 

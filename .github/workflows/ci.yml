@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-22.04
+    container:
+      image: osrf/ros:humble-desktop-full
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ros-humble-xacro \
+            ros-humble-ros-gz \
+            ros-humble-ign-ros2-control \
+            ros-humble-ros2-control \
+            ros-humble-ros2-controllers \
+            ros-humble-navigation2 \
+            ros-humble-nav2-bringup \
+            ros-humble-slam-toolbox \
+            ros-humble-robot-localization \
+            ros-humble-twist-mux \
+            ros-humble-teleop-twist-joy \
+            ros-humble-joint-state-publisher-gui \
+            ros-humble-joy \
+            ros-humble-tf-transformations \
+            ros-humble-moveit \
+            ros-humble-moveit-servo \
+            ros-humble-rtabmap-ros \
+            ros-humble-diagnostic-aggregator \
+            python3-colcon-common-extensions
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Build
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          cd morpheus_ws
+          colcon build --symlink-install
+        env:
+          ROS_LOCALHOST_ONLY: 1
+
+      - name: Test
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          cd morpheus_ws
+          source install/setup.bash
+          colcon test --packages-select morpheus_control morpheus_description morpheus_nav2
+          colcon test-result --verbose
+        env:
+          ROS_LOCALHOST_ONLY: 1

@@ -1,8 +1,8 @@
-from ament_index_python.packages import get_package_share_directory
 import os
 from pathlib import Path
-import xacro
 
+import xacro
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
@@ -11,10 +11,10 @@ from launch.actions import (
     SetEnvironmentVariable,
     TimerAction,
 )
+from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression
-from launch.conditions import IfCondition
 from launch_ros.actions import Node
 
 
@@ -284,7 +284,7 @@ def generate_launch_description():
         output='screen',
     )
 
-    bridge_camera_mini = Node(
+    Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         name='bridge_camera_mini',

@@ -12,19 +12,16 @@ The node operates in two modes controlled by the 'mode' parameter:
 """
 
 import numpy as np
-
 import rclpy
-from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data
-
+import tf2_ros
+import tf_transformations
 from geometry_msgs.msg import (
     PoseWithCovarianceStamped,
     TransformStamped,
 )
+from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
 from ros2_aruco_interfaces.msg import ArucoMarkers
-
-import tf2_ros
-import tf_transformations
 
 
 def pose_to_matrix(x, y, z, roll, pitch, yaw):
@@ -168,7 +165,7 @@ class ArucoLocalization(Node):
 
             avg_trans = np.zeros(3)
             avg_quat = np.zeros(4)
-            for (_, T_c, _), w in zip(corrections, weights):
+            for (_, T_c, _), w in zip(corrections, weights, strict=False):
                 avg_trans += w * T_c[:3, 3]
                 q = tf_transformations.quaternion_from_matrix(T_c)
                 if avg_quat @ q < 0:

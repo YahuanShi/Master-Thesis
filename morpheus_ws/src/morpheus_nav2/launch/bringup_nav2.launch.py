@@ -1,10 +1,12 @@
+import os
+
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.conditions import IfCondition
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
-from ament_index_python.packages import get_package_share_directory
-import os
+
 
 def generate_launch_description():
     pkg = get_package_share_directory('morpheus_nav2')

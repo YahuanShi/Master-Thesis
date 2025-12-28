@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import argparse
 import os
+import xml.etree.ElementTree as ET
+
 import cv2
 import numpy as np
-import xml.etree.ElementTree as ET
+
 
 def parse_heightmap_size(model_sdf):
     # 解析 Gazebo/IGN 高程图 <size> X Y Z
@@ -14,7 +16,7 @@ def parse_heightmap_size(model_sdf):
     for tag in root.iter():
         if tag.tag.endswith('size'):
             # 父链为 heightmap?
-            parent = tag.getparent() if hasattr(tag, "getparent") else None
+            tag.getparent() if hasattr(tag, "getparent") else None
         # 简单粗暴遍历：只要文本像 3 个浮点就当它是 size（本模型通常唯一）
         try:
             vals = list(map(float, tag.text.strip().split()))

@@ -18,9 +18,11 @@ controller_interface::CallbackReturn MorpheusDriveController::on_init()
   auto_declare<double>("drive_gain", 10.0);
   auto_declare<double>("deadzone", 0.05);
 
-  auto_declare<std::vector<std::string>>("steering_joints",
+  auto_declare<std::vector<std::string>>(
+    "steering_joints",
     {"steering_fl_joint", "steering_fr_joint", "steering_rl_joint", "steering_rr_joint"});
-  auto_declare<std::vector<std::string>>("wheel_joints",
+  auto_declare<std::vector<std::string>>(
+    "wheel_joints",
     {"wheel_fl_joint", "wheel_fr_joint", "wheel_rl_joint", "wheel_rr_joint"});
 
   auto_declare<bool>("publish_odom", true);
@@ -37,7 +39,8 @@ controller_interface::CallbackReturn MorpheusDriveController::on_configure(
   params_.wheel_base = get_node()->get_parameter("wheel_base").as_double();
   params_.wheel_radius = get_node()->get_parameter("wheel_radius").as_double();
   params_.wheel_separation = get_node()->get_parameter("wheel_separation").as_double();
-  params_.wheel_steering_y_offset = get_node()->get_parameter("wheel_steering_y_offset").as_double();
+  params_.wheel_steering_y_offset =
+    get_node()->get_parameter("wheel_steering_y_offset").as_double();
   params_.drive_gain = get_node()->get_parameter("drive_gain").as_double();
   params_.deadzone = get_node()->get_parameter("deadzone").as_double();
 
@@ -71,12 +74,19 @@ controller_interface::CallbackReturn MorpheusDriveController::on_configure(
       rcl_interfaces::msg::SetParametersResult result;
       result.successful = true;
       for (const auto & p : parameters) {
-        if (p.get_name() == "wheel_base") { params_.wheel_base = p.as_double(); }
-        else if (p.get_name() == "wheel_radius") { params_.wheel_radius = p.as_double(); }
-        else if (p.get_name() == "wheel_separation") { params_.wheel_separation = p.as_double(); }
-        else if (p.get_name() == "wheel_steering_y_offset") { params_.wheel_steering_y_offset = p.as_double(); }
-        else if (p.get_name() == "drive_gain") { params_.drive_gain = p.as_double(); }
-        else if (p.get_name() == "deadzone") { params_.deadzone = p.as_double(); }
+        if (p.get_name() == "wheel_base") {
+          params_.wheel_base = p.as_double();
+        } else if (p.get_name() == "wheel_radius") {
+          params_.wheel_radius = p.as_double();
+        } else if (p.get_name() == "wheel_separation") {
+          params_.wheel_separation = p.as_double();
+        } else if (p.get_name() == "wheel_steering_y_offset") {
+          params_.wheel_steering_y_offset = p.as_double();
+        } else if (p.get_name() == "drive_gain") {
+          params_.drive_gain = p.as_double();
+        } else if (p.get_name() == "deadzone") {
+          params_.deadzone = p.as_double();
+        }
       }
       RCLCPP_INFO(get_node()->get_logger(), "Parameters updated");
       return result;
@@ -141,9 +151,9 @@ controller_interface::return_type MorpheusDriveController::update(
   double vy = cmd.linear.y;
   double wz = cmd.angular.z;
 
-  if (std::abs(vx) < params_.deadzone) { vx = 0.0; }
-  if (std::abs(vy) < params_.deadzone) { vy = 0.0; }
-  if (std::abs(wz) < params_.deadzone) { wz = 0.0; }
+  if (std::abs(vx) < params_.deadzone) {vx = 0.0;}
+  if (std::abs(vy) < params_.deadzone) {vy = 0.0;}
+  if (std::abs(wz) < params_.deadzone) {wz = 0.0;}
 
   double pos[4] = {0.0, 0.0, 0.0, 0.0};
   double vel[4] = {0.0, 0.0, 0.0, 0.0};
@@ -226,8 +236,8 @@ void MorpheusDriveController::compute_ackermann(
     double a_fl = std::atan(wb / r_bl);
     double a_fr = std::atan(wb / r_br);
 
-    if (r_bl > 0.0 && r < 0.0) { a_fl -= M_PI; }
-    if (r_br < 0.0 && r > 0.0) { a_fr += M_PI; }
+    if (r_bl > 0.0 && r < 0.0) {a_fl -= M_PI;}
+    if (r_br < 0.0 && r > 0.0) {a_fr += M_PI;}
 
     pos[0] = a_fl * 1.57;
     pos[1] = a_fr * 1.57;
@@ -240,7 +250,9 @@ void MorpheusDriveController::compute_ackermann(
   vel[1] = sign * std::hypot(vx + wz * st / 2.0, wz * wb / 2.0) + vel_offset;
   vel[2] = vel[0];
   vel[3] = vel[1];
-  for (int i = 0; i < 4; ++i) { vel[i] *= g; }
+  for (int i = 0; i < 4; ++i) {
+    vel[i] *= g;
+  }
 }
 
 void MorpheusDriveController::compute_pivot(
@@ -268,12 +280,16 @@ void MorpheusDriveController::compute_crab(
     if (std::abs(angle) >= M_PI / 2.0) {
       angle = -((angle > 0.0) ? 1.0 : -1.0) * (M_PI - std::abs(angle));
     }
-    for (int i = 0; i < 4; ++i) { pos[i] = angle; }
+    for (int i = 0; i < 4; ++i) {
+      pos[i] = angle;
+    }
   }
 
   double mag = std::hypot(vx, vy);
   double sign = (vx > 0.0) ? 1.0 : ((vx < 0.0) ? -1.0 : 1.0);
-  for (int i = 0; i < 4; ++i) { vel[i] = mag * sign * g; }
+  for (int i = 0; i < 4; ++i) {
+    vel[i] = mag * sign * g;
+  }
 }
 
 void MorpheusDriveController::update_odometry(const rclcpp::Duration & /*period*/)
@@ -289,7 +305,9 @@ void MorpheusDriveController::update_odometry(const rclcpp::Duration & /*period*
   }
 
   if (!odom_initialized_) {
-    for (size_t i = 0; i < 4; ++i) { prev_wheel_pos_[i] = wheel_pos[i]; }
+    for (size_t i = 0; i < 4; ++i) {
+      prev_wheel_pos_[i] = wheel_pos[i];
+    }
     odom_initialized_ = true;
     return;
   }
@@ -310,14 +328,18 @@ void MorpheusDriveController::update_odometry(const rclcpp::Duration & /*period*
 
   // Average steering angle for crab motion
   double avg_steer = 0.0;
-  for (int i = 0; i < 4; ++i) { avg_steer += steer_pos[i]; }
+  for (int i = 0; i < 4; ++i) {
+    avg_steer += steer_pos[i];
+  }
   avg_steer /= 4.0;
 
   odom_x_ += d_center * std::cos(odom_yaw_ + avg_steer);
   odom_y_ += d_center * std::sin(odom_yaw_ + avg_steer);
   odom_yaw_ += d_theta;
 
-  for (size_t i = 0; i < 4; ++i) { prev_wheel_pos_[i] = wheel_pos[i]; }
+  for (size_t i = 0; i < 4; ++i) {
+    prev_wheel_pos_[i] = wheel_pos[i];
+  }
 }
 
 }  // namespace morpheus_control

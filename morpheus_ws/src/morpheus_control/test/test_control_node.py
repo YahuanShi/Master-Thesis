@@ -68,14 +68,20 @@ class TestControlNode(unittest.TestCase):
         self.assertTrue(ok, 'Control node did not publish within timeout')
 
     def test_forward_cmd_vel(self):
-        self.received_pos = None
-        self.received_vel = None
+        ok = self._spin_until(
+            lambda: self.pub.get_subscription_count() > 0, timeout=10.0)
+        self.assertTrue(ok, 'cmd_vel publisher has no matched subscriptions')
+
         msg = Twist()
         msg.linear.x = 1.0
-        self.pub.publish(msg)
-        ok = self._spin_until(
-            lambda: (self.received_vel is not None
-                     and any(v != 0.0 for v in self.received_vel)))
+        type(self).received_vel = None
+
+        def check_and_publish():
+            self.pub.publish(msg)
+            return (self.received_vel is not None
+                    and any(v != 0.0 for v in self.received_vel))
+
+        ok = self._spin_until(check_and_publish, timeout=15.0)
         self.assertTrue(ok, 'No non-zero velocity after publishing cmd_vel')
         self.assertEqual(len(self.received_pos), 4)
         self.assertEqual(len(self.received_vel), 4)

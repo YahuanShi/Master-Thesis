@@ -44,4 +44,31 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 
+# --- Tests ---
+if(BUILD_TESTING)
+  find_package(ament_cmake_pytest REQUIRED)
+  find_package(ament_cmake_gtest REQUIRED)
+
+  ament_add_pytest_test(test_ground_segmentation
+    test/test_ground_segmentation.py
+    TIMEOUT 30
+  )
+  ament_add_pytest_test(test_aruco_localization
+    test/test_aruco_localization.py
+    TIMEOUT 30
+  )
+
+  ament_add_gtest(test_is_aruco_detected
+    test/test_is_aruco_detected.cpp
+    TIMEOUT 30
+  )
+  target_include_directories(test_is_aruco_detected PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  )
+  target_link_libraries(test_is_aruco_detected morpheus_is_aruco_detected_bt_node)
+  ament_target_dependencies(test_is_aruco_detected
+    rclcpp behaviortree_cpp_v3 nav2_behavior_tree ros2_aruco_interfaces
+  )
+endif()
+
 ament_package()

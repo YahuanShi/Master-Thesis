@@ -6,12 +6,10 @@ clouds based on a height threshold in the sensor frame, and republishes
 each on separate topics for costmap consumption.
 """
 
-import struct
 import numpy as np
-
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
+from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import PointCloud2, PointField
 
 

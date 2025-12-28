@@ -36,14 +36,15 @@ public:
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
-  struct ChassisParams {
+  struct ChassisParams
+  {
     double wheel_base{1.072};
     double wheel_radius{0.125};
     double wheel_separation{0.615};
     double wheel_steering_y_offset{0.0};
     double drive_gain{10.0};
     double deadzone{0.05};
-    double steering_track() const { return wheel_separation - 2.0 * wheel_steering_y_offset; }
+    double steering_track() const {return wheel_separation - 2.0 * wheel_steering_y_offset;}
   };
 
   void compute_ackermann(double vx, double wz, double pos[4], double vel[4]) const;
