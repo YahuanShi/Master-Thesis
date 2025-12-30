@@ -33,16 +33,16 @@ A simulated Mars rover built with **ROS 2 Humble** and **Gazebo**, featuring fou
                     └──────┬──────┘         │  controller, │
                            │                │  BT, recovs) │
                     ┌──────▼──────┐         └──────▲───────┘
-                    │ Drive Ctrl  │                │
+                    │  Drive Ctrl │                │
                     │ (ros2_ctrl) │         ┌──────┴───────┐
-                    └──────┬──────┘         │  Costmaps    │
-                           │                │  (2D + 3D)   │
+                    └──────┬──────┘         │   Costmaps   │
+                           │                │   (2D + 3D)  │
                     ┌──────▼──────┐         └──────▲───────┘
                     │   Gazebo    │                │
                     │  Sim + HW   │──sensors──►  Perception
-                    └─────────────┘           (LiDAR, cam,
-                                              ground seg,
-                                              ArUco, EKF)
+                    └─────────────┘             (LiDAR, cam,
+                                                 ground seg,
+                                                 ArUco, EKF)
 ```
 
 Full node topology, TF tree, and data flow in [docs/architecture.md](docs/architecture.md).
@@ -54,7 +54,7 @@ Morpheus/
 ├── docker/                         Dockerfile, compose, GPU passthrough
 ├── docs/                           Architecture diagrams
 ├── MarsYard2024/                   Mars Yard mesh/texture/USD assets
-├── .github/workflows/ci.yml       CI: build + test in Docker
+├── .github/workflows/ci.yml        CI: build + test in Docker
 ├── run_morpheus_all.sh             One-command full-stack launcher
 └── morpheus_ws/src/
     ├── morpheus_description/       URDF/xacro model, meshes, sensor macros
@@ -72,51 +72,36 @@ Morpheus/
 - Docker with NVIDIA Container Toolkit (for GPU-accelerated Gazebo rendering)
 - A joystick/gamepad (optional, for teleoperation)
 
-### Build and Run
+### One-Command Setup
 
 ```bash
-# Build the Docker image
-cd docker && docker compose build
+git clone https://github.com/YahuanShi/Morpheus.git
+cd Morpheus
 
-# Start the container (GPU, X11, joystick passthrough)
-docker compose up -d
-docker compose exec morpheus bash
+# Build image, start container, enter shell (first run builds everything)
+./docker/run.sh
 
-# Inside the container
-cd /workspace/Morpheus/morpheus_ws
-colcon build --symlink-install
-source install/setup.bash
-
-# Launch the full stack
-cd /workspace/Morpheus
-./run_morpheus_all.sh
+# Inside the container — build the workspace (only needed once)
+cd morpheus_ws && colcon build --symlink-install
 ```
 
-### Launch Modes
+All ROS 2 / Gazebo / Nav2 dependencies are installed in the container. The workspace is mounted from the host, so source edits and build artifacts persist across container restarts.
+
+### Common Commands
 
 ```bash
-# Default: map-based localization
-./run_morpheus_all.sh
+# From the host — all commands go through docker/run.sh:
+./docker/run.sh              # Enter container shell
+./docker/run.sh build        # colcon build inside container
+./docker/run.sh test         # Run all tests
+./docker/run.sh launch       # Launch full simulation stack
+./docker/run.sh stop         # Stop the container
+./docker/run.sh clean        # Wipe build cache and rebuild image
 
-# Online SLAM for unknown environments
-./run_morpheus_all.sh mode:=mapping
-
-# Explicit localization mode
-./run_morpheus_all.sh mode:=localization
-```
-
-### Run a Patrol Mission
-
-```bash
-ros2 run morpheus_nav2 patrol_mission.py
-```
-
-### Run Tests
-
-```bash
-cd morpheus_ws
-colcon test --packages-select morpheus_control morpheus_description morpheus_nav2
-colcon test-result --verbose
+# Inside the container:
+./run_morpheus_all.sh                     # Default: map-based localization
+./run_morpheus_all.sh mode:=mapping       # Online SLAM
+ros2 run morpheus_nav2 patrol_mission.py  # Autonomous patrol
 ```
 
 ## Package Details
@@ -152,10 +137,11 @@ Gazebo world definitions, robot spawning, and ROS-GZ bridge configuration for al
 
 ## Docker
 
-The project includes a complete Docker setup for reproducible builds:
+The entire development environment runs inside a single Docker container — no host-side ROS installation needed. `docker/run.sh` handles image building, container lifecycle, and workspace compilation.
 
-- **Dockerfile**: Based on `osrf/ros:humble-desktop-full`, installs the full ROS 2 navigation/control/simulation stack, and builds a patched `slam_toolbox` from source
-- **docker-compose.yml**: GPU passthrough, X11 forwarding, joystick device, and host network mode
+- **Dockerfile**: Based on `osrf/ros:humble-desktop-full`, installs the full ROS 2 navigation/control/simulation stack plus dev tools (ruff, pre-commit, pytest), and builds a patched `slam_toolbox` from source
+- **docker-compose.yml**: NVIDIA GPU passthrough, X11 forwarding, DRI devices, joystick input, host networking, and persistent build volumes
+- **entrypoint.sh**: Auto-sources ROS 2, slam_toolbox, and workspace overlays — entering the container is immediately ready to `ros2 launch`
 - **CI**: GitHub Actions runs build + test in the same ROS 2 container image
 
 The `slam_toolbox` patch fixes a TF lookup deadlock specific to Gazebo's single-threaded executor — the stock `getOdomPose()` uses exact-timestamp lookups with zero timeout, which silently fails when the TF buffer can't update during the scan callback.

@@ -35,6 +35,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-humble-rtabmap-ros \
         ros-humble-diagnostic-aggregator \
         python3-colcon-common-extensions \
+        python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 ENV DEBIAN_FRONTEND=
@@ -55,7 +56,8 @@ RUN groupadd --gid "$USER_GID" "$USERNAME" \
     && groupadd -f --gid 109 render \
     && useradd --uid "$USER_UID" --gid "$USER_GID" -G video,render -m -s /bin/bash "$USERNAME" \
     && echo "source /opt/ros/humble/setup.bash" >> "/home/$USERNAME/.bashrc" \
-    && echo "source /tmp/slam_toolbox_src/install/setup.bash" >> "/home/$USERNAME/.bashrc"
+    && echo "[ -f /tmp/slam_toolbox_src/install/setup.bash ] && source /tmp/slam_toolbox_src/install/setup.bash" >> "/home/$USERNAME/.bashrc" \
+    && echo "[ -f /workspace/Morpheus/morpheus_ws/install/setup.bash ] && source /workspace/Morpheus/morpheus_ws/install/setup.bash" >> "/home/$USERNAME/.bashrc"
 
 # Build slam_toolbox from source with a patched getOdomPose().
 # The stock implementation uses tf_->transform() with the exact scan timestamp
@@ -74,5 +76,18 @@ RUN bash -c '\
     && rm -rf build log src /tmp/slam_toolbox_tf_fix.patch \
     '
 
+COPY --chmod=755 entrypoint.sh /ros_entrypoint.sh
+
 USER $USERNAME
 WORKDIR /workspace/Morpheus
+
+# Dev tools installed to user home — keeps system Python (ament) untouched
+RUN pip3 install --user --no-cache-dir \
+        ruff \
+        pre-commit \
+        transforms3d \
+        vcstool
+ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
+
+ENTRYPOINT ["/ros_entrypoint.sh"]
+CMD ["bash"]

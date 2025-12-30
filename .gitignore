@@ -27,6 +27,9 @@ log/
 **/lib/*.so
 **/lib/*.a
 
+# Demo recording intermediates
+docs/demo_raw.mp4
+
 # Misc
 *.swp
 *.swo

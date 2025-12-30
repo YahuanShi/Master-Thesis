@@ -11,19 +11,22 @@ services:
     tty: true
     network_mode: host
     ipc: host
+    privileged: false
     environment:
-      - DISPLAY=${DISPLAY}
+      - DISPLAY=${DISPLAY:-:0}
       - NVIDIA_DRIVER_CAPABILITIES=all
       - ROS_LOCALHOST_ONLY=1
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ..:/workspace/Morpheus
     devices:
-      - /dev/input
+      - /dev/dri:/dev/dri
+      - /dev/input:/dev/input
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: all
-              capabilities: [gpu]
+              capabilities: [gpu, compute, utility, graphics]
