@@ -202,8 +202,8 @@ else
   pub_cmd 0.0 0.0 0.0 1
 
   # ── Step 7: Patrol mission ───────────────────────────────────────
-  log "Starting patrol mission..."
-  drun "timeout 60 ros2 run morpheus_nav2 patrol_mission.py \
+  log "Starting patrol mission (240 s)..."
+  drun "timeout 240 ros2 run morpheus_nav2 patrol_mission.py \
     >/dev/null 2>&1" || true
   log "Patrol mission finished."
 
@@ -226,7 +226,7 @@ log "Raw recording: $RAW_VIDEO ($RAW_SIZE)"
 # ── Step 9: Post-process ────────────────────────────────────────────
 log "Encoding final MP4..."
 ffmpeg -y -i "$RAW_VIDEO" \
-  -vf "scale=1920:-2" \
+  -vf "scale=1280:-2" \
   -c:v libx264 -preset slow -crf 22 \
   "$FINAL_MP4" </dev/null 2>/dev/null
 

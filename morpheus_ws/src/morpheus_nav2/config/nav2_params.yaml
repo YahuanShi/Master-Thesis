@@ -5,8 +5,8 @@ amcl:
     odom_frame_id: odom
     global_frame_id: map
     scan_topic: /scan
-    min_particles: 500
-    max_particles: 2000
+    min_particles: 100
+    max_particles: 500
     laser_model_type: likelihood_field
     odom_alpha1: 0.2
     odom_alpha2: 0.2
@@ -87,8 +87,8 @@ controller_server:
     progress_checker_plugin: "progress_checker"
     progress_checker:
       plugin: "nav2_controller::SimpleProgressChecker"
-      required_movement_radius: 0.3
-      movement_time_allowance: 4.0
+      required_movement_radius: 0.05
+      movement_time_allowance: 20.0
     goal_checker_plugins: ["goal_checker"]
     goal_checker:
       plugin: "nav2_controller::SimpleGoalChecker"
@@ -97,21 +97,25 @@ controller_server:
       stateful: True
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 0.8
-      max_angular_accel: 1.2
-      lookahead_dist: 1.2
-      min_lookahead_dist: 0.6
-      max_lookahead_dist: 3.0
-      lookahead_time: 2.0
+      desired_linear_vel: 0.6
+      max_angular_accel: 0.8
+      lookahead_dist: 0.8
+      min_lookahead_dist: 0.4
+      max_lookahead_dist: 2.0
+      lookahead_time: 1.5
       use_velocity_scaled_lookahead_dist: true
-      rotate_to_heading: false           # 连续圆弧转向，避免走走停停
+      rotate_to_heading: false
       allow_reversing: false
-      transform_tolerance: 0.2
+      transform_tolerance: 0.3
       use_interpolation: true
-      use_cost_regulated_linear_velocity_scaling: true
-      cost_scaling_dist: 0.8
-      cost_scaling_gain: 1.0
-      curvature_lookahead_dist: 1.2
+      # KEY FIX: cost-regulated scaling was pinning velocity to ~0 in MarsYard's
+      # obstacle-dense terrain. Disabled — speed is now controlled only by
+      # path curvature, not by proximity to obstacles.
+      use_cost_regulated_linear_velocity_scaling: false
+      use_regulated_linear_velocity_scaling: true   # curvature-only regulation
+      regulated_linear_scaling_min_radius: 0.5
+      regulated_linear_scaling_min_speed: 0.25      # never drop below 0.25 m/s
+      curvature_lookahead_dist: 0.8
       min_curvature: 0.0
       max_curvature: 1.0
 
@@ -124,7 +128,7 @@ planner_server:
     planner_plugins: ["GridBased"]
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"
-      tolerance: 0.3
+      tolerance: 0.5
       use_astar: true
 
 behavior_server:
@@ -163,9 +167,9 @@ global_costmap:
     use_sim_time: True
     global_frame: map
     robot_base_frame: chassis_link
-    update_frequency: 2.0
-    publish_frequency: 1.0
-    resolution: 0.12          # 原图 0.012207，可略粗以提速
+    update_frequency: 5.0
+    publish_frequency: 2.0
+    resolution: 0.15          # 粗化分辨率：50m地图从174K格降到111K格，A*更快
     rolling_window: false
     width: 50.0
     height: 50.0
@@ -210,8 +214,8 @@ global_costmap:
       publish_voxel_map: True
     inflation_layer:
       plugin: "nav2_costmap_2d::InflationLayer"
-      inflation_radius: 0.7
-      cost_scaling_factor: 2.5
+      inflation_radius: 0.55
+      cost_scaling_factor: 3.0
 
 local_costmap:
   ros__parameters:

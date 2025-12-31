@@ -29,6 +29,8 @@ def generate_launch_description():
     twist_mux_cfg  = LaunchConfiguration('twist_mux_cfg',  default=os.path.join(pkg, 'config', 'twist_mux.yaml'))
     with_visual_odom = LaunchConfiguration('with_visual_odom', default='false')
 
+    # PythonExpression evaluates at runtime so the condition survives
+    # being passed through IncludeLaunchDescription from morpheus_spawn
     is_localization = PythonExpression(["'", mode, "' == 'localization'"])
     is_mapping      = PythonExpression(["'", mode, "' == 'mapping'"])
     is_not_mapping  = PythonExpression(["'", mode, "' != 'mapping'"])
@@ -80,19 +82,29 @@ def generate_launch_description():
     )
 
     # ---------------------------
-    # Static map→odom TF (simulation: EKF fuses Gazebo ground truth so
-    # odom == world; AMCL must NOT override this with tf_broadcast: false)
+    # Static map→odom TF (simulation bypass)
     # ---------------------------
+    # In simulation, the EKF fuses Gazebo's ground-truth odometry (/gz/odom),
+    # so the odom frame already coincides with the world frame.  The map→odom
+    # transform should therefore be the identity.
+    # AMCL normally publishes this TF, but on sloped terrain its particle filter
+    # diverges (the 3D LiDAR scan doesn't match the flat 2D map), causing the
+    # rover to plan paths in the wrong reference frame.
+    # Fix: publish a static identity map→odom TF and tell AMCL not to broadcast
+    # (tf_broadcast: false in nav2_params.yaml).  AMCL still runs because the
+    # lifecycle manager requires it, but it no longer touches the TF tree.
     static_map_odom = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='static_map_odom',
         arguments=['0', '0', '0', '0', '0', '0', '1', 'map', 'odom'],
-        condition=IfCondition(is_not_mapping),
+        condition=IfCondition(is_not_mapping),  # not needed in mapping: slam_toolbox provides the TF
     )
 
     # ---------------------------
     # Visual odometry (rtabmap rgbd_odometry)
+    # Disabled by default (with_visual_odom=false) — high CPU cost in simulation.
+    # Enable for real hardware where wheel odometry is unreliable.
     # ---------------------------
     vo_params = os.path.join(pkg, 'config', 'visual_odom.yaml')
 
@@ -139,6 +151,10 @@ def generate_launch_description():
 
     # ---------------------------
     # Point cloud ground segmentation
+    # Subscribes to /scan/points (raw LiDAR) and publishes:
+    #   /scan/points/obstacles — above-ground objects + steep slopes
+    #   /scan/points/ground    — flat traversable ground
+    # Both outputs feed the voxel_layer in the Nav2 costmaps.
     # ---------------------------
     ground_seg = Node(
         package='morpheus_nav2',
@@ -152,7 +168,7 @@ def generate_launch_description():
     # Nav2 Nodes
     # ---------------------------
 
-    # --- Localization mode: map_server + AMCL ---
+    # Localization mode: pre-built map + AMCL particle filter
     map_server = Node(
         package='nav2_map_server',
         executable='map_server',
@@ -172,7 +188,7 @@ def generate_launch_description():
         condition=IfCondition(is_localization)
     )
 
-    # --- Mapping mode: slam_toolbox online async ---
+    # Mapping mode: slam_toolbox builds the map online while the rover explores
     slam_toolbox = Node(
         package='slam_toolbox',
         executable='async_slam_toolbox_node',
@@ -190,7 +206,9 @@ def generate_launch_description():
         parameters=[params_file, {'use_sim_time': use_sim_time}]
     )
 
-    # 关键①：把 controller_server 的 /cmd_vel 重映射到 /cmd_vel_nav
+    # Remap /cmd_vel → /cmd_vel_nav so Nav2 output goes through twist_mux
+    # rather than directly to the robot.  twist_mux merges Nav2 + teleop with
+    # priority, ensuring joystick can always override autonomous navigation.
     controller = Node(
         package='nav2_controller',
         executable='controller_server',
@@ -208,8 +226,8 @@ def generate_launch_description():
         parameters=[params_file, {'use_sim_time': use_sim_time}]
     )
 
-    # 关键②：behavior_server 也会发布 /cmd_vel（多个插件各占一个 publisher）
-    # 同样重映射到 /cmd_vel_nav，杜绝直接写 /cmd_vel
+    # behavior_server also publishes /cmd_vel (for spin/backup recovery behaviors)
+    # — must be remapped to /cmd_vel_nav for the same reason as controller_server
     behavior = Node(
         package='nav2_behaviors',
         executable='behavior_server',
@@ -240,6 +258,9 @@ def generate_launch_description():
         parameters=[params_file, {'use_sim_time': use_sim_time}]
     )
 
+    # Two lifecycle managers: one for localization mode (includes map_server + amcl),
+    # one for mapping mode (excludes them — slam_toolbox manages its own lifecycle).
+    # Only one runs at a time based on the `mode` argument.
     lifecycle_mgr_loc = Node(
         package='nav2_lifecycle_manager',
         executable='lifecycle_manager',
@@ -300,21 +321,20 @@ def generate_launch_description():
         name='teleop_twist_joy',
         output='screen',
         parameters=[teleop_cfg, {'use_sim_time': use_sim_time}],
-        remappings=[('/cmd_vel', '/cmd_vel_joy')],
+        remappings=[('/cmd_vel', '/cmd_vel_joy')],  # separate topic so twist_mux can prioritise
         condition=IfCondition(with_teleop)
     )
 
+    # twist_mux always runs (no with_teleop condition) because Nav2 navigation
+    # requires it to bridge /cmd_vel_nav → /cmd_vel.  Without twist_mux running,
+    # autonomous navigation produces no motion even when teleop is not in use.
     twist_mux = Node(
         package='twist_mux',
         executable='twist_mux',
         name='twist_mux',
         output='screen',
         parameters=[twist_mux_cfg, {'use_sim_time': use_sim_time}],
-        # mux 输出到标准 /cmd_vel，供 morpheus_control 订阅
-        # 注意：不加 with_teleop 条件 — twist_mux 必须始终运行以将
-        # Nav2 的 /cmd_vel_nav 桥接到 /cmd_vel；teleop/joy 节点才是
-        # 可选的
-        remappings=[('/cmd_vel_out', '/cmd_vel')],
+        remappings=[('/cmd_vel_out', '/cmd_vel')],  # mux output → robot driver topic
     )
 
     return LaunchDescription([

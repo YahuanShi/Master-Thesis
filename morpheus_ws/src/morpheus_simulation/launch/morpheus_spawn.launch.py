@@ -50,18 +50,13 @@ def generate_launch_description():
                               description='Launch RViz2'),
         DeclareLaunchArgument('with_teleop',  default_value='true',
                               description='Launch teleop_twist_joy + twist_mux'),
-        DeclareLaunchArgument('spawn_x',      default_value='0.0',
-                              description='Rover spawn X position'),
-        DeclareLaunchArgument('spawn_y',      default_value='4.0',
-                              description='Rover spawn Y position'),
+        DeclareLaunchArgument('spawn_x',      default_value='0.0'),
+        DeclareLaunchArgument('spawn_y',      default_value='4.0'),
         DeclareLaunchArgument('spawn_z',      default_value='1.5',
-                              description='Rover spawn Z position'),
-        DeclareLaunchArgument('spawn_R',      default_value='0.0',
-                              description='Rover spawn roll'),
-        DeclareLaunchArgument('spawn_P',      default_value='0.0',
-                              description='Rover spawn pitch'),
-        DeclareLaunchArgument('spawn_Y',      default_value='0.0',
-                              description='Rover spawn yaw'),
+                              description='Z is set above ground so the rover drops onto terrain'),
+        DeclareLaunchArgument('spawn_R',      default_value='0.0'),
+        DeclareLaunchArgument('spawn_P',      default_value='0.0'),
+        DeclareLaunchArgument('spawn_Y',      default_value='0.0'),
     ]
 
     # ----------------------------
@@ -73,7 +68,10 @@ def generate_launch_description():
     morpheus_nav2_path        = get_package_share_directory('morpheus_nav2')
 
     # ----------------------------
-    # Gazebo: resources + launcher
+    # Gazebo resource path
+    # GZ_SIM_RESOURCE_PATH tells Ignition Gazebo where to search for worlds,
+    # meshes, and models.  We add both the simulation worlds directory and the
+    # parent of morpheus_description so that the URDF's mesh URIs resolve.
     # ----------------------------
     gazebo_resource_path = SetEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
@@ -87,13 +85,13 @@ def generate_launch_description():
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([gz_pkg_path, '/gz_sim.launch.py']),
         launch_arguments={
-            'gz_args': [world_arg, '.sdf', ' -v 1', ' -r'],
+            'gz_args': [world_arg, '.sdf', ' -v 1', ' -r'],  # -r: start simulation running
             'gui': gui_arg,
         }.items(),
     )
 
     # ----------------------------
-    # (Optional) ArUco recognition (uses zed_2i)
+    # ArUco recognition (optional — skipped if ros2_aruco not installed)
     # ----------------------------
     aruco_node = None
     try:
@@ -121,12 +119,16 @@ def generate_launch_description():
         aruco_node = None
 
     # ----------------------------
-    # Robot spawn (xacro -> URDF)
+    # Robot description: xacro → URDF string
+    # xacro is processed at Python import time (before any ROS nodes start),
+    # so the resulting URDF string is available immediately for both
+    # robot_state_publisher and the Gazebo spawn command.
     # ----------------------------
     xacro_file = os.path.join(morpheus_description_path, 'urdf', 'robot.xacro')
     doc = xacro.process_file(xacro_file, mappings={'use_sim': 'true'})
     robot_desc = doc.toprettyxml(indent='  ')
 
+    # robot_state_publisher broadcasts joint states as TF transforms
     node_robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -145,13 +147,16 @@ def generate_launch_description():
             '-string', robot_desc,
             '-x', spawn_x,
             '-y', spawn_y,
-            '-z', spawn_z,
+            '-z', spawn_z,    # drops from above to let terrain contact settle
             '-R', spawn_R,
             '-P', spawn_P,
             '-Y', spawn_Y,
         ],
     )
 
+    # Nav2 and many tools use 'base_link' as the conventional robot base frame.
+    # Morpheus uses 'chassis_link' in its URDF, so we publish an identity alias
+    # TF so that Nav2 costmaps and RViz displays work without modification.
     static_base_alias = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -161,7 +166,13 @@ def generate_launch_description():
     )
 
     # ----------------------------
-    # Controllers via spawner
+    # ros2_control controller spawning
+    # Controllers must be spawned in a specific order:
+    #   1. gz_spawn_entity must complete first (robot must exist in Gazebo before
+    #      the controller manager can interface with its joints)
+    #   2. joint_state_broadcaster must activate before position/velocity controllers
+    #      (they depend on joint state feedback to compute commands)
+    # RegisterEventHandler + OnProcessExit enforces this sequencing.
     # ----------------------------
     controller = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -211,6 +222,8 @@ def generate_launch_description():
         output='screen'
     )
 
+    # Wait 1 s after spawn before starting JSB, giving the controller manager
+    # time to discover the robot's joints in Gazebo
     activate_jsb_after_spawn = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=gz_spawn_entity,
@@ -218,6 +231,7 @@ def generate_launch_description():
         )
     )
 
+    # All other controllers start once JSB is confirmed active
     activate_rest_after_jsb = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=spawner_jsb,
@@ -226,7 +240,11 @@ def generate_launch_description():
     )
 
     # ----------------------------
-    # ROS-Gazebo bridges
+    # ROS-Gazebo topic bridges
+    # Each bridge maps one GZ topic ↔ one ROS topic.
+    # Format: /topic@ros_type[gz_type  (unidirectional GZ→ROS)
+    #         /topic@ros_type]gz_type  (unidirectional ROS→GZ)
+    #         /topic@ros_type@gz_type  (bidirectional)
     # ----------------------------
     bridge_clock = Node(
         package='ros_gz_bridge',
@@ -293,8 +311,10 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Odom bridge — world name is parameterized; republish to /gz/odom
-    # so EKF config doesn't need to know the world name
+    # Gazebo publishes odometry under a world-scoped topic that includes the
+    # world name: /world/<world>/model/morpheus_rover/odometry.
+    # We remap it to the fixed topic /gz/odom so the EKF config never needs
+    # to know the world name at launch time.
     odom_bridge_arg = PythonExpression([
         "'/world/' + '", world_arg,
         "' + '/model/morpheus_rover/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry'"
@@ -321,7 +341,10 @@ def generate_launch_description():
     )
 
     # ----------------------------
-    # EKF (publish odom->base_link)
+    # EKF sensor fusion
+    # Fuses /gz/odom (Gazebo ground-truth) + /imu → /odometry/filtered.
+    # In simulation this gives near-perfect odometry.
+    # On real hardware, replace /gz/odom with wheel encoder odometry.
     # ----------------------------
     ekf_node = Node(
         package='robot_localization',
@@ -336,7 +359,10 @@ def generate_launch_description():
     )
 
     # ----------------------------
-    # Nav2 Bringup
+    # Nav2 Bringup (delayed)
+    # 2-second delay ensures the EKF node is publishing /odometry/filtered
+    # before Nav2 nodes subscribe to it.  Without the delay, Nav2 may start
+    # with no odometry source and fail to initialise the costmap TF chain.
     # ----------------------------
     nav2_bringup_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -365,7 +391,7 @@ def generate_launch_description():
     )
 
     # ----------------------------
-    # LaunchDescription
+    # LaunchDescription assembly
     # ----------------------------
     ld_items = [
         *declare_args,
@@ -376,8 +402,8 @@ def generate_launch_description():
         static_base_alias,
         gz_spawn_entity,
 
-        activate_jsb_after_spawn,
-        activate_rest_after_jsb,
+        activate_jsb_after_spawn,   # JSB starts 1 s after spawn completes
+        activate_rest_after_jsb,    # other controllers start after JSB
 
         controller,
 
@@ -392,7 +418,7 @@ def generate_launch_description():
         bridge_depth_cloud_2i,
 
         ekf_node,
-        activate_nav2,
+        activate_nav2,  # delayed 2 s to let EKF stabilise
 
         rviz,
     ]

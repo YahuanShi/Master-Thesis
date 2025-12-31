@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+"""Convert a Gazebo heightmap DEM image into a Nav2 occupancy grid (map.png + map.yaml).
+
+Two modes:
+  slope  (default) — marks pixels with high gradient (steep terrain) as obstacles.
+                     Preferred: flat traversable areas stay free; cliff edges become walls.
+  height            — marks pixels above a height threshold as obstacles.
+                     Simpler but can block legitimate high-altitude flat terrain.
+"""
 import argparse
 import os
 import xml.etree.ElementTree as ET
@@ -8,16 +16,19 @@ import numpy as np
 
 
 def parse_heightmap_size(model_sdf):
-    # 解析 Gazebo/IGN 高程图 <size> X Y Z
-    # 常见路径：model.sdf -> <model>...<link>...<visual>...<geometry><heightmap><size>sx sy sz</size>
+    """Read the world-space <size> (X Y Z metres) from a Gazebo heightmap model.sdf.
+
+    The <size> element gives the physical extent of the terrain mesh in world units.
+    We need it to compute the metres-per-pixel resolution of the DEM image.
+    We scan all elements for a 3-float text value rather than navigating the exact
+    XML path, because the heightmap nesting varies across Gazebo versions.
+    """
     tree = ET.parse(model_sdf)
     root = tree.getroot()
     size_vals = None
     for tag in root.iter():
         if tag.tag.endswith('size'):
-            # 父链为 heightmap?
             tag.getparent() if hasattr(tag, "getparent") else None
-        # 简单粗暴遍历：只要文本像 3 个浮点就当它是 size（本模型通常唯一）
         try:
             vals = list(map(float, tag.text.strip().split()))
             if len(vals) == 3:
@@ -31,10 +42,15 @@ def parse_heightmap_size(model_sdf):
     return sx, sy, sz
 
 def build_occupancy_from_dem(dem_path, mode='slope', thresh=20, ksize=5, inflate=2, invert=False):
-    """
-    mode='height'：按高度二值化；mode='slope'：按坡度边缘二值化（推荐）
-    thresh：阈值（高度或梯度）；ksize：Sobel核；inflate：障碍膨胀像素
-    invert：有些 DEM 黑低白高，可根据需要翻转
+    """Convert a DEM grayscale image to a binary occupancy image (white=obstacle, black=free).
+
+    Slope mode uses the Sobel operator to approximate local terrain gradient.
+    The Sobel kernel computes a finite-difference derivative of the image intensity,
+    which is proportional to the terrain height gradient (i.e., slope steepness).
+    Pixels where the gradient magnitude exceeds `thresh` are marked as obstacles.
+
+    inflate: morphological dilation radius (pixels) added around all obstacles as
+    a safety margin, so the rover's footprint clears detected edges.
     """
     gray = cv2.imread(dem_path, cv2.IMREAD_GRAYSCALE)
     if gray is None:
@@ -44,19 +60,18 @@ def build_occupancy_from_dem(dem_path, mode='slope', thresh=20, ksize=5, inflate
         gray = 255 - gray
 
     if mode == 'height':
-        # 低处视为可通行，高处为障碍（按需要调阈值）
-        _, occ = cv2.threshold(gray, thresh, 255, cv2.THRESH_BINARY_INV)  # 白=障碍, 黑=free
+        # Pixels brighter than thresh = high terrain = obstacle
+        _, occ = cv2.threshold(gray, thresh, 255, cv2.THRESH_BINARY_INV)
     else:
-        # 坡度法：对地形的边缘/急剧变化当障碍，平坦区域可行
+        # Sobel: compute image gradient magnitude as a proxy for terrain slope
         gx = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=ksize)
         gy = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=ksize)
         mag = cv2.magnitude(gx, gy)
         mag = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-        _, occ = cv2.threshold(mag, thresh, 255, cv2.THRESH_BINARY)  # 白=障碍
-        occ = 255 - occ  # 反转：白=free, 黑=障碍  -> 再翻转回 occupancy 规范
-        occ = 255 - occ  # occupancy 里白(255)=occupied，黑(0)=free，我们最终要白=障碍
-        # 先把 free=0, occ=255 的格式确认
-    # 膨胀一点当作安全裕度
+        _, occ = cv2.threshold(mag, thresh, 255, cv2.THRESH_BINARY)  # high gradient → white
+        occ = 255 - occ  # invert to free=white, obstacle=black
+        occ = 255 - occ  # re-invert to obstacle=white (ROS occupancy convention)
+
     if inflate > 0:
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2*inflate+1, 2*inflate+1))
         occ = cv2.dilate(occ, kernel)
@@ -93,29 +108,30 @@ def main():
     map_png = os.path.join(args.out_dir, 'map.png')
     map_yaml = os.path.join(args.out_dir, 'map.yaml')
 
-    # 1) 从 model.sdf 解析地形物理尺寸
-    sx, sy, sz = parse_heightmap_size(args.terrain_model_sdf)  # 单位：米
-    # 2) 根据 DEM 分辨率换算每像素米数
+    # Step 1: read physical terrain size from SDF (metres)
+    sx, sy, sz = parse_heightmap_size(args.terrain_model_sdf)
+    # Step 2: derive metres-per-pixel from DEM image width vs physical X extent
     img = cv2.imread(args.dem_image, cv2.IMREAD_GRAYSCALE)
     if img is None:
         raise FileNotFoundError(args.dem_image)
     h, w = img.shape[:2]
-    resolution = sx / float(w)  # 假设 DEM X 对应图像宽度
-    # 3) 生成 occupancy 图（白=障碍，黑=free）
+    resolution = sx / float(w)   # assumes DEM X axis maps to image width
+
+    # Step 3: build occupancy image (white=obstacle, black=free)
     occ = build_occupancy_from_dem(args.dem_image, mode=args.mode,
                                    thresh=args.thresh, ksize=args.ksize,
                                    inflate=args.inflate, invert=args.invert)
     cv2.imwrite(map_png, occ)
 
-    # 4) 设置 origin（地图图像左下角在世界坐标的 (-sx/2, -sy/2)）
+    # Step 4: origin = world position of the image's bottom-left corner.
+    # Gazebo centres the terrain at (0,0), so the corner is at (-sx/2, -sy/2).
     origin = (-sx/2.0, -sy/2.0, 0.0)
 
-    # 5) 写 map.yaml
-    # build_occupancy_from_dem() outputs white=obstacle/black=free (see its
-    # final comment); map_server's negate=0 expects the opposite
-    # (white=free/black=occupied), so negate=1 is required to read this
-    # image correctly. Without it, ~99% of the map comes back as "occupied"
-    # (including the rover's own footprint), and Nav2 can't plan any path.
+    # Step 5: write map.yaml with negate=1.
+    # build_occupancy_from_dem() outputs white=obstacle / black=free.
+    # ROS map_server's default (negate=0) interprets white=free / black=occupied.
+    # negate=1 flips the interpretation so the image is read correctly.
+    # Without negate=1, ~99% of the map appears occupied and Nav2 cannot plan any path.
     write_map_yaml(map_yaml, 'map.png', resolution, origin,
                    negate=1, occ_thresh=0.65, free_thresh=0.2)
 

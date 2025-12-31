@@ -12,8 +12,8 @@
     <RecoveryNode number_of_retries="3" name="NavigateRecovery">
       <PipelineSequence name="NavigateWithReplanning">
 
-        <!-- Replan global path at 2 Hz -->
-        <RateController hz="2.0">
+        <!-- Replan global path at 5 Hz -->
+        <RateController hz="5.0">
           <RecoveryNode number_of_retries="1" name="ComputePathToPose">
             <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
             <ClearEntireCostmap name="ClearGlobalCostmap-Context"
@@ -38,23 +38,24 @@
 
       </PipelineSequence>
 
-      <!-- Recovery: clear costmaps + spin to rescan, then wait -->
+      <!-- Recovery: clear costmaps and wait for sensor refresh, no spin.
+           Spin is omitted because EKF yaw noise on rough terrain causes the
+           Spin behavior to never detect completion, blocking for minutes. -->
       <ReactiveFallback name="RecoveryFallback">
         <GoalUpdated/>
         <RoundRobin name="Recovery">
-          <Sequence name="ClearAndSpin">
+          <Sequence name="ClearAndWait">
             <ClearEntireCostmap name="ClearLocal"
               service_name="local_costmap/clear_entirely_local_costmap"/>
             <ClearEntireCostmap name="ClearGlobal"
               service_name="global_costmap/clear_entirely_global_costmap"/>
-            <Spin spin_dist="1.57"/>
+            <Wait wait_duration="1"/>
           </Sequence>
-          <Sequence name="SpinAndClear">
-            <Spin spin_dist="-1.57"/>
+          <Sequence name="ClearAndWait2">
             <ClearEntireCostmap name="ClearLocal2"
               service_name="local_costmap/clear_entirely_local_costmap"/>
+            <Wait wait_duration="2"/>
           </Sequence>
-          <Wait wait_duration="2"/>
         </RoundRobin>
       </ReactiveFallback>
     </RecoveryNode>

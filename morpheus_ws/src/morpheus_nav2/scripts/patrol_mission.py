@@ -2,7 +2,6 @@
 """Patrol mission — sequentially navigate to waypoints, checking for ArUco markers at each stop."""
 
 import time
-from rclpy.duration import Duration
 
 import rclpy
 import yaml
@@ -21,12 +20,14 @@ except ImportError:
 
 class PatrolMission:
     def __init__(self):
+        # BasicNavigator wraps the Nav2 action clients (NavigateToPose, etc.)
+        # and provides a synchronous-style API on top of ROS 2 async actions
         self.nav = BasicNavigator('patrol_mission')
 
         self.nav.declare_parameter('waypoints_file', '')
         self.nav.declare_parameter('loop', True)
         self.nav.declare_parameter('dwell_time', 3.0)
-        self.nav.declare_parameter('waypoint_timeout', 90.0)
+        self.nav.declare_parameter('waypoint_timeout', 150.0)
         self.nav.declare_parameter('initial_x', 0.0)
         self.nav.declare_parameter('initial_y', 4.0)
         self.nav.declare_parameter('initial_yaw', 0.0)
@@ -42,6 +43,8 @@ class PatrolMission:
 
         self.recent_markers: list[int] = []
         if _HAS_ARUCO:
+            # BEST_EFFORT QoS to match the ArUco publisher; RELIABLE would cause
+            # the subscription to never receive messages if publishers differ
             qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT)
             self.nav.create_subscription(
                 ArucoMarkers, '/aruco_detector_2i/aruco_markers',
@@ -51,6 +54,7 @@ class PatrolMission:
         self.nav.get_logger().info(f'Loading waypoints from {path}')
         with open(path) as f:
             data = yaml.safe_load(f)
+        # Support two YAML layouts: flat 'waypoints' list or ROS param-style nesting
         wps = data.get('waypoints', [])
         if not wps:
             raw = data.get('patrol_mission', {}).get('ros__parameters', {})
@@ -68,6 +72,7 @@ class PatrolMission:
         goal.header.stamp = self.nav.get_clock().now().to_msg()
         goal.pose.position.x = float(wp['x'])
         goal.pose.position.y = float(wp['y'])
+        # Convert yaw to quaternion — Nav2 expects full orientation, not just yaw
         q = quaternion_from_euler(0.0, 0.0, float(wp.get('yaw', 0.0)))
         goal.pose.orientation.x = q[0]
         goal.pose.orientation.y = q[1]
@@ -78,6 +83,8 @@ class PatrolMission:
     def run(self):
         log = self.nav.get_logger()
 
+        # Publish an initial pose estimate to AMCL so the particle filter starts
+        # near the true spawn position rather than spreading across the whole map
         ix = self.nav.get_parameter('initial_x').value
         iy = self.nav.get_parameter('initial_y').value
         iyaw = self.nav.get_parameter('initial_yaw').value
@@ -92,6 +99,10 @@ class PatrolMission:
         self.nav.setInitialPose(init_pose)
         log.info(f'Initial pose: ({ix}, {iy}, yaw={iyaw})')
 
+        # Block until all Nav2 lifecycle nodes are in the 'active' state.
+        # localizer='amcl' means it specifically waits for AMCL to activate,
+        # not just the planner/controller. This matters because AMCL loads the
+        # map and sets up the particle filter before it transitions to active.
         log.info('Waiting for Nav2...')
         self.nav.waitUntilNav2Active(localizer='amcl')
 
@@ -108,6 +119,9 @@ class PatrolMission:
                 goal = self._make_goal(wp)
                 self.nav.goToPose(goal)
 
+                # Per-waypoint timeout using monotonic time (not ROS sim time)
+                # so it always counts real wall-clock seconds, unaffected by
+                # Gazebo time scale or pauses
                 deadline = time.monotonic() + self.waypoint_timeout
                 while not self.nav.isTaskComplete():
                     rclpy.spin_once(self.nav, timeout_sec=0.1)
@@ -131,6 +145,12 @@ class PatrolMission:
                 return
 
     def _dwell_and_detect(self, wp_name: str):
+        """Pause at a waypoint and collect any ArUco marker observations.
+
+        Uses spin_once in a loop rather than time.sleep so that the ROS callback
+        queue keeps draining — without this, incoming ArUco messages would queue
+        up and never be processed during the dwell period.
+        """
         log = self.nav.get_logger()
         self.recent_markers.clear()
 
