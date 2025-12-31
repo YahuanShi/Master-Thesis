@@ -4,8 +4,9 @@
 #  Records Gazebo + RViz side-by-side, runs a scripted driving
 #  sequence and patrol mission, then converts to GIF for README.
 #
-#  Runs on the HOST. The Docker container handles all ROS/Gazebo work;
-#  ffmpeg captures the X11 display from outside.
+#  Runs on the HOST. Uses docker/run.sh to manage the container
+#  (inherits docker-compose GPU, DRI, FastDDS config). ffmpeg
+#  captures the X11 display from outside.
 #
 #  Usage:
 #    ./scripts/record_demo.sh              # full auto
@@ -16,8 +17,8 @@ set -euo pipefail
 
 # ── Configuration ────────────────────────────────────────────────────
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DOCKER_DIR="$PROJECT_DIR/docker"
 CONTAINER="morpheus-sim"
-IMAGE="morpheus-sim"
 DISPLAY_ID="${DISPLAY:-:0.0}"
 FPS=30
 OUTPUT_DIR="$PROJECT_DIR/docs"
@@ -39,15 +40,22 @@ done
 
 # ── Helpers ──────────────────────────────────────────────────────────
 log()  { echo -e "\033[1;36m[demo]\033[0m $*"; }
-warn() { echo -e "\033[1;33m[demo]\033[0m $*"; }
 die()  { echo -e "\033[1;31m[demo]\033[0m $*" >&2; exit 1; }
+
+ROS_ENV="source /opt/ros/humble/setup.bash && \
+  [ -f /tmp/slam_toolbox_src/install/setup.bash ] && source /tmp/slam_toolbox_src/install/setup.bash; \
+  [ -f /workspace/Morpheus/morpheus_ws/install/setup.bash ] && source /workspace/Morpheus/morpheus_ws/install/setup.bash;"
+
+drun() {
+  local flags="-i"
+  [ -t 0 ] && flags="-it"
+  docker exec $flags "$CONTAINER" bash -c "$ROS_ENV $*"
+}
 
 cleanup() {
   log "Cleaning up..."
-  # Stop recording
   [ -n "${FFMPEG_PID:-}" ] && kill "$FFMPEG_PID" 2>/dev/null && wait "$FFMPEG_PID" 2>/dev/null
-  # Stop ROS stack inside container
-  docker exec "$CONTAINER" bash -c "pkill -f morpheus_spawn 2>/dev/null; pkill -f 'ros2' 2>/dev/null" || true
+  docker exec "$CONTAINER" bash -c "pkill -f 'ros2 launch|morpheus_spawn|ign gazebo|gz sim' 2>/dev/null" || true
   log "Done."
 }
 trap cleanup EXIT
@@ -62,37 +70,24 @@ log "Display $DISPLAY_ID @ $RESOLUTION"
 
 mkdir -p "$OUTPUT_DIR"
 
-# ── Step 1: Ensure container is running ──────────────────────────────
+# ── Step 1: Ensure container via docker-compose ─────────────────────
 if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER}$"; then
-  log "Starting container..."
+  log "Starting container via docker-compose..."
+  rm -f /dev/shm/fastrtps_* 2>/dev/null || true
   xhost +local:docker >/dev/null 2>&1 || true
-  docker run -d --rm \
-    --gpus all \
-    --network host \
-    --ipc host \
-    --env DISPLAY="$DISPLAY_ID" \
-    --env NVIDIA_DRIVER_CAPABILITIES=all \
-    --env ROS_LOCALHOST_ONLY=1 \
-    --volume /tmp/.X11-unix:/tmp/.X11-unix:rw \
-    --volume "$PROJECT_DIR":/workspace/Morpheus \
-    --device /dev/input \
-    --name "$CONTAINER" \
-    "$IMAGE" \
-    sleep infinity
+  cd "$DOCKER_DIR"
+  HOST_UID="$(id -u)" HOST_GID="$(id -g)" docker compose up -d --build
+  cd "$PROJECT_DIR"
   sleep 2
   log "Container started."
 else
   log "Container already running."
 fi
 
-dexec() { docker exec "$CONTAINER" bash -c "$*"; }
-
 # ── Step 2: Build workspace ─────────────────────────────────────────
 if [ "$SKIP_BUILD" = false ]; then
   log "Building workspace inside container..."
-  dexec "source /opt/ros/humble/setup.bash && \
-         cd /workspace/Morpheus/morpheus_ws && \
-         colcon build --symlink-install 2>&1 | tail -5"
+  drun "cd /workspace/Morpheus/morpheus_ws && colcon build --symlink-install 2>&1 | tail -5"
   log "Build complete."
 else
   log "Skipping build (--skip-build)."
@@ -113,12 +108,10 @@ log "Recording (PID $FFMPEG_PID)."
 
 # ── Step 4: Launch full stack ────────────────────────────────────────
 log "Launching Gazebo + Nav2 + RViz..."
-dexec "source /opt/ros/humble/setup.bash && \
-       source /tmp/slam_toolbox_src/install/setup.bash && \
-       cd /workspace/Morpheus/morpheus_ws && source install/setup.bash && \
-       ros2 launch morpheus_simulation morpheus_spawn.launch.py \
-         with_rviz:=true with_teleop:=false \
-         </dev/null >/dev/null 2>&1 &"
+drun "cd /workspace/Morpheus && \
+  ros2 launch morpheus_simulation morpheus_spawn.launch.py \
+    with_rviz:=true with_teleop:=false \
+    </dev/null >/dev/null 2>&1 &"
 
 # ── Step 5: Wait for system ready ───────────────────────────────────
 log "Waiting for Gazebo and Nav2 to initialize..."
@@ -126,9 +119,7 @@ log "Waiting for Gazebo and Nav2 to initialize..."
 wait_for_topic() {
   local topic="$1" timeout="$2" elapsed=0
   while [ $elapsed -lt "$timeout" ]; do
-    if dexec "source /opt/ros/humble/setup.bash && \
-              source /workspace/Morpheus/morpheus_ws/install/setup.bash && \
-              ros2 topic list 2>/dev/null" | grep -q "$topic"; then
+    if drun "ros2 topic list 2>/dev/null" | grep -q "$topic"; then
       return 0
     fi
     sleep 3
@@ -160,11 +151,9 @@ else
 
   pub_cmd() {
     local lx="$1" ly="$2" az="$3" dur="$4"
-    dexec "source /opt/ros/humble/setup.bash && \
-           source /workspace/Morpheus/morpheus_ws/install/setup.bash && \
-           timeout $dur ros2 topic pub /cmd_vel geometry_msgs/msg/Twist \
-             \"{linear: {x: $lx, y: $ly}, angular: {z: $az}}\" \
-             --rate 10 >/dev/null 2>&1" || true
+    drun "timeout $dur ros2 topic pub /cmd_vel geometry_msgs/msg/Twist \
+      \"{linear: {x: $lx, y: $ly}, angular: {z: $az}}\" \
+      --rate 10 >/dev/null 2>&1" || true
   }
 
   # Scene overview (let camera settle)
@@ -199,10 +188,8 @@ else
 
   # ── Step 7: Patrol mission ───────────────────────────────────────
   log "Starting patrol mission..."
-  dexec "source /opt/ros/humble/setup.bash && \
-         source /workspace/Morpheus/morpheus_ws/install/setup.bash && \
-         timeout 60 ros2 run morpheus_nav2 patrol_mission.py \
-           >/dev/null 2>&1" || true
+  drun "timeout 60 ros2 run morpheus_nav2 patrol_mission.py \
+    >/dev/null 2>&1" || true
   log "Patrol mission finished."
 
   sleep 3

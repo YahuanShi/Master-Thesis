@@ -32,6 +32,8 @@ die()  { echo -e "\033[1;31m[Morpheus]\033[0m $*" >&2; exit 1; }
 ensure_container() {
   if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER}$"; then
     log "Preparing container..."
+    # Clean stale FastRTPS SHM files (--ipc host shares /dev/shm with the host)
+    rm -f /dev/shm/fastrtps_* 2>/dev/null || true
     xhost +local:docker >/dev/null 2>&1 || true
     HOST_UID="$(id -u)" HOST_GID="$(id -g)" docker compose up -d --build
     log "Container ready."

@@ -76,6 +76,10 @@ RUN bash -c '\
     && rm -rf build log src /tmp/slam_toolbox_tf_fix.patch \
     '
 
+COPY disable_shm.xml /etc/fastdds/disable_shm.xml
+RUN chmod 644 /etc/fastdds/disable_shm.xml
+ENV FASTRTPS_DEFAULT_PROFILES_FILE=/etc/fastdds/disable_shm.xml
+
 COPY --chmod=755 entrypoint.sh /ros_entrypoint.sh
 
 USER $USERNAME

@@ -256,7 +256,8 @@ def generate_launch_description():
         package='ros_gz_bridge',
         executable='parameter_bridge',
         name='bridge_camera_2i',
-        arguments=['/camera_2i@sensor_msgs/msg/Image@gz.msgs.Image'],
+        arguments=['/camera_2i/image@sensor_msgs/msg/Image[gz.msgs.Image'],
+        remappings=[('/camera_2i/image', '/camera_2i')],
         output='screen',
     )
 
