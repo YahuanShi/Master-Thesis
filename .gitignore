@@ -38,3 +38,18 @@ docs/demo_raw.mp4
 TODO.md
 frames_*.gv
 frames_*.pdf
+
+# Orphaned / duplicate assets (kept locally, excluded from repo)
+morpheus_isaac.usd
+structure.txt
+MarsYard2024/texture_*.png
+
+# Unused DEM heightmap variants (SDF only needs mars_4096_hm.geaendert.png)
+morpheus_ws/src/morpheus_simulation/worlds/marsyard2022_terrain/dem/mars_4096_hm.png
+morpheus_ws/src/morpheus_simulation/worlds/marsyard2022_terrain/dem/mars_4096_hm_inverted.png
+morpheus_ws/src/morpheus_simulation/worlds/marsyard2022_terrain/dem/mars_4096_hm_inverted80.png
+morpheus_ws/src/morpheus_simulation/worlds/marsyard2022_terrain/dem/mars_4096_hm_inverted.geaendert.png
+
+# GitHub boilerplate templates (portfolio repo — not needed)
+.github/ISSUE_TEMPLATE/
+.github/pull_request_template.md
