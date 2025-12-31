@@ -1,16 +1,32 @@
 waypoints:
-  - name: "marker_front"
-    x: 1.0
-    y: 3.5
-    yaw: 3.14
-  - name: "box_5_approach"
-    x: -1.5
-    y: 3.0
-    yaw: -2.36
-  - name: "south_patrol"
-    x: 0.0
-    y: 2.5
+  - name: "north_east"
+    x: 3.0
+    y: 6.5
+    yaw: 1.57
+  - name: "east"
+    x: 4.0
+    y: 4.0
+    yaw: 0.0
+  - name: "south_east"
+    x: 2.5
+    y: 2.0
     yaw: -1.57
+  - name: "south"
+    x: 0.0
+    y: 1.5
+    yaw: 3.14
+  - name: "south_west"
+    x: -2.5
+    y: 2.0
+    yaw: 1.57
+  - name: "west"
+    x: -4.0
+    y: 4.0
+    yaw: 3.14
+  - name: "north_west"
+    x: -3.0
+    y: 6.5
+    yaw: 1.57
   - name: "return_home"
     x: 0.0
     y: 4.0

@@ -15,8 +15,14 @@ services:
     environment:
       - DISPLAY=${DISPLAY:-:0}
       - NVIDIA_DRIVER_CAPABILITIES=all
+      - NVIDIA_VISIBLE_DEVICES=all
       - ROS_LOCALHOST_ONLY=1
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      # CycloneDDS 0.9.x defaults MaxAutoParticipantIndex=9 (10 participants max).
+      # Morpheus stack has 30+ nodes — raise the limit without re-specifying the
+      # interface (ROS_LOCALHOST_ONLY=1 owns that; duplicating it causes "lo: same
+      # interface may not be selected twice" and domain-creation failure).
+      - CYCLONEDDS_URI=<CycloneDDS><Domain><Discovery><MaxAutoParticipantIndex>200</MaxAutoParticipantIndex></Discovery></Domain></CycloneDDS>
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ..:/workspace/Morpheus

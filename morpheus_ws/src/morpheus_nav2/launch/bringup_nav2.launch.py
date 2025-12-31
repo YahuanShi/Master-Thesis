@@ -27,9 +27,11 @@ def generate_launch_description():
     with_joy       = LaunchConfiguration('with_joy',       default='false')
     teleop_cfg     = LaunchConfiguration('teleop_cfg',     default=os.path.join(pkg, 'config', 'teleop_joy.yaml'))
     twist_mux_cfg  = LaunchConfiguration('twist_mux_cfg',  default=os.path.join(pkg, 'config', 'twist_mux.yaml'))
+    with_visual_odom = LaunchConfiguration('with_visual_odom', default='false')
 
     is_localization = PythonExpression(["'", mode, "' == 'localization'"])
     is_mapping      = PythonExpression(["'", mode, "' == 'mapping'"])
+    is_not_mapping  = PythonExpression(["'", mode, "' != 'mapping'"])
 
     declare_use_sim_time = DeclareLaunchArgument(
         'use_sim_time', default_value=use_sim_time,
@@ -78,6 +80,18 @@ def generate_launch_description():
     )
 
     # ---------------------------
+    # Static map→odom TF (simulation: EKF fuses Gazebo ground truth so
+    # odom == world; AMCL must NOT override this with tf_broadcast: false)
+    # ---------------------------
+    static_map_odom = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_map_odom',
+        arguments=['0', '0', '0', '0', '0', '0', '1', 'map', 'odom'],
+        condition=IfCondition(is_not_mapping),
+    )
+
+    # ---------------------------
     # Visual odometry (rtabmap rgbd_odometry)
     # ---------------------------
     vo_params = os.path.join(pkg, 'config', 'visual_odom.yaml')
@@ -94,6 +108,7 @@ def generate_launch_description():
             ('rgb/camera_info', '/camera_2i/camera_info'),
             ('odom', '/visual_odom'),
         ],
+        condition=IfCondition(with_visual_odom),
     )
 
     # ---------------------------
@@ -296,8 +311,10 @@ def generate_launch_description():
         output='screen',
         parameters=[twist_mux_cfg, {'use_sim_time': use_sim_time}],
         # mux 输出到标准 /cmd_vel，供 morpheus_control 订阅
+        # 注意：不加 with_teleop 条件 — twist_mux 必须始终运行以将
+        # Nav2 的 /cmd_vel_nav 桥接到 /cmd_vel；teleop/joy 节点才是
+        # 可选的
         remappings=[('/cmd_vel_out', '/cmd_vel')],
-        condition=IfCondition(with_teleop)
     )
 
     return LaunchDescription([
@@ -312,6 +329,9 @@ def generate_launch_description():
         declare_with_joy,
         declare_teleop_cfg,
         declare_twist_mux_cfg,
+
+        # Static map→odom (simulation ground truth bypass)
+        static_map_odom,
 
         # Visual odometry (feeds EKF as odom1)
         visual_odom,

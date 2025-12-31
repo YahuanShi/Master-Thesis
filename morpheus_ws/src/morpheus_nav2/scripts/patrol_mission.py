@@ -2,6 +2,7 @@
 """Patrol mission — sequentially navigate to waypoints, checking for ArUco markers at each stop."""
 
 import time
+from rclpy.duration import Duration
 
 import rclpy
 import yaml
@@ -25,6 +26,7 @@ class PatrolMission:
         self.nav.declare_parameter('waypoints_file', '')
         self.nav.declare_parameter('loop', True)
         self.nav.declare_parameter('dwell_time', 3.0)
+        self.nav.declare_parameter('waypoint_timeout', 90.0)
         self.nav.declare_parameter('initial_x', 0.0)
         self.nav.declare_parameter('initial_y', 4.0)
         self.nav.declare_parameter('initial_yaw', 0.0)
@@ -36,6 +38,7 @@ class PatrolMission:
         self.waypoints = self._load_waypoints(wf)
         self.loop = self.nav.get_parameter('loop').value
         self.dwell_time = self.nav.get_parameter('dwell_time').value
+        self.waypoint_timeout = self.nav.get_parameter('waypoint_timeout').value
 
         self.recent_markers: list[int] = []
         if _HAS_ARUCO:
@@ -105,8 +108,13 @@ class PatrolMission:
                 goal = self._make_goal(wp)
                 self.nav.goToPose(goal)
 
+                deadline = time.monotonic() + self.waypoint_timeout
                 while not self.nav.isTaskComplete():
                     rclpy.spin_once(self.nav, timeout_sec=0.1)
+                    if time.monotonic() > deadline:
+                        log.warn(f'Timeout ({self.waypoint_timeout:.0f}s) reaching {name}, canceling')
+                        self.nav.cancelTask()
+                        break
 
                 result = self.nav.getResult()
                 if result == TaskResult.SUCCEEDED:

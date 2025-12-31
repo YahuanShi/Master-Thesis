@@ -107,34 +107,49 @@ fi
 log "Recording (PID $FFMPEG_PID)."
 
 # ── Step 4: Launch full stack ────────────────────────────────────────
+# Kill any existing stack first — a second simultaneous launch duplicates TF
+# publishers, breaks CycloneDDS participant indices, and causes RViz red errors.
+log "Stopping any running ROS stack..."
+docker exec "$CONTAINER" bash -c "pkill -9 -f 'ros2 launch' 2>/dev/null; true"
+# Release any orphaned DDS ports on the host (accumulated if container was
+# force-restarted while using the old setsid/nohup launch approach)
+ss -ulnp 2>/dev/null | grep -oP '(74|75)[0-9]{2}.*?pid=\K[0-9]+' | sort -u | \
+  xargs kill -9 2>/dev/null || true
+sleep 1
+
 log "Launching Gazebo + Nav2 + RViz..."
-drun "cd /workspace/Morpheus && \
+docker exec -d "$CONTAINER" bash -c "
+  source /opt/ros/humble/setup.bash &&
+  source /workspace/Morpheus/morpheus_ws/install/setup.bash &&
+  export __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json &&
   ros2 launch morpheus_simulation morpheus_spawn.launch.py \
     with_rviz:=true with_teleop:=false \
-    </dev/null >/dev/null 2>&1 &"
+    >/tmp/morpheus_launch.log 2>&1
+"
 
 # ── Step 5: Wait for system ready ───────────────────────────────────
 log "Waiting for Gazebo and Nav2 to initialize..."
 
-wait_for_topic() {
-  local topic="$1" timeout="$2" elapsed=0
+wait_for_nav2() {
+  local timeout="$1" elapsed=0
   while [ $elapsed -lt "$timeout" ]; do
-    if drun "ros2 topic list 2>/dev/null" | grep -q "$topic"; then
+    if docker exec "$CONTAINER" bash -c \
+        "grep -q 'Managed nodes are active' /tmp/morpheus_launch.log 2>/dev/null"; then
       return 0
     fi
-    sleep 3
-    elapsed=$((elapsed + 3))
+    sleep 5
+    elapsed=$((elapsed + 5))
   done
   return 1
 }
 
-if ! wait_for_topic "/cmd_vel" 120; then
-  die "Timed out waiting for ROS stack to come up."
+if ! wait_for_nav2 240; then
+  die "Timed out waiting for Nav2 to become active."
 fi
-log "ROS topics active."
+log "Nav2 active."
 
-# Extra settle time for Gazebo to finish loading the world
-sleep 15
+# Extra settle time for Gazebo to finish rendering
+sleep 5
 log "System ready."
 
 if [ "$MANUAL_MODE" = true ]; then

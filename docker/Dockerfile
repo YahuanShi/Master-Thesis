@@ -76,9 +76,16 @@ RUN bash -c '\
     && rm -rf build log src /tmp/slam_toolbox_tf_fix.patch \
     '
 
-COPY disable_shm.xml /etc/fastdds/disable_shm.xml
-RUN chmod 644 /etc/fastdds/disable_shm.xml
-ENV FASTRTPS_DEFAULT_PROFILES_FILE=/etc/fastdds/disable_shm.xml
+# Switch to CycloneDDS — FastDDS 2.6.x (Humble) cannot fully suppress its
+# SHM discovery ports (/dev/shm/fastrtps_port*) via XML profile alone.
+# With ipc:host the host and container share /dev/shm, so stale SHM segments
+# from earlier runs block port init for later-starting nodes, causing them to
+# fall through to different transports and become invisible to each other.
+# CycloneDDS uses plain UDP multicast/unicast with no shared-memory segments.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ros-humble-rmw-cyclonedds-cpp \
+    && rm -rf /var/lib/apt/lists/*
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 COPY --chmod=755 entrypoint.sh /ros_entrypoint.sh
 
