@@ -18,7 +18,7 @@ PARAMS = ChassisParams()
 
 class TestDeadzone:
     def test_all_below_deadzone(self):
-        pos, vel = compute_drive(0.01, 0.01, 0.01, PARAMS)
+        pos, vel = compute_drive(0.005, 0.005, 0.005, PARAMS)
         np.testing.assert_array_equal(pos, 0.0)
         np.testing.assert_array_equal(vel, 0.0)
 
@@ -27,8 +27,8 @@ class TestDeadzone:
         assert np.all(vel != 0.0)
 
     def test_exact_deadzone_boundary_passes_through(self):
-        """Deadzone is strict '<', so exactly 0.05 is NOT filtered."""
-        _, vel = compute_drive(0.05, 0.0, 0.0, PARAMS)
+        """Deadzone is strict '<', so exactly PARAMS.deadzone is NOT filtered."""
+        _, vel = compute_drive(PARAMS.deadzone, 0.0, 0.0, PARAMS)
         assert np.all(vel != 0.0)
 
 

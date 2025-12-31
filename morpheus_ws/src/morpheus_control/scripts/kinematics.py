@@ -13,8 +13,9 @@ class ChassisParams:
     wheel_steering_y_offset: float = 0.0  # lateral offset of steering pivot from wheel center
     wheel_separation: float = 0.615    # left-to-right track width
     drive_gain: float = 10.0           # scales normalised [-1,1] cmd to controller units
-    deadzone: float = 0.01             # ignore joystick noise below this magnitude
-                                        # (must be < Nav2 min cmd, which can be ~0.05)
+    # deadzone must be < Nav2's minimum cmd (~0.05), otherwise legitimate
+    # navigation velocities get swallowed as if they were joystick noise.
+    deadzone: float = 0.01
 
     @property
     def steering_track(self) -> float:
@@ -25,7 +26,8 @@ class ChassisParams:
 def compute_drive(
     vx: float, vy: float, wz: float, params: ChassisParams
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Compute steering positions and wheel velocities from cmd_vel.
+    """
+    Compute steering positions and wheel velocities from cmd_vel.
 
     Drive mode selection:
       wz != 0 and vx != 0  →  Ackermann (arc turn while driving forward)
@@ -59,7 +61,8 @@ def _ackermann(
     vx: float, wz: float, p: ChassisParams,
     pos: np.ndarray, vel: np.ndarray,
 ) -> None:
-    """Ackermann steering: compute per-wheel steer angle and speed for an arc turn.
+    """
+    Ackermann steering: compute per-wheel steer angle and speed for an arc turn.
 
     The instantaneous turn radius r is derived from the linear/angular velocity
     ratio. Multiplying by 2π converts from rad/s ratio to the arc-length radius
@@ -114,7 +117,8 @@ def _pivot(
     wz: float, p: ChassisParams,
     pos: np.ndarray, vel: np.ndarray,
 ) -> None:
-    """In-place rotation: all wheels steer to point tangent to the turn circle.
+    """
+    In-place rotation: all wheels steer to point tangent to the turn circle.
 
     The optimal steer angle is atan(wheel_base / steering_track), which makes
     each wheel perpendicular to the radius line — minimising tyre scrub.
@@ -140,7 +144,8 @@ def _crab(
     vx: float, vy: float, p: ChassisParams,
     pos: np.ndarray, vel: np.ndarray,
 ) -> None:
-    """Crab (holonomic strafe): all wheels point in the same direction.
+    """
+    Crab (holonomic strafe): all wheels point in the same direction.
 
     The steer angle is the direction of the velocity vector. Angles beyond ±90°
     are wrapped by reversing the wheel spin instead — avoids mechanically
